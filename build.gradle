@@ -25,6 +25,7 @@ ext {
   elasticVersion = '7.3.0'
   log4j2Version = '2.12.0'
   junitJupiterVersion = '5.4.2'
+  mockitoVersion = '3.0.0'
 }
 
 
@@ -124,7 +125,8 @@ subprojects {
     testImplementation ("org.apache.logging.log4j:log4j-1.2-api:$log4j2Version")
     testImplementation ("org.apache.logging.log4j:log4j-api:$log4j2Version")
 
-    testImplementation ("org.mockito:mockito-all:1.10.19")
+    testImplementation ("org.mockito:mockito-core:$mockitoVersion")
+    testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
 
     javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
     offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
