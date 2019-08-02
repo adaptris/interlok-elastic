@@ -19,9 +19,14 @@ package com.adaptris.core.elastic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Iterator;
+
 import org.elasticsearch.common.Strings;
 import org.junit.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
@@ -55,8 +60,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
   @Test
   public void testBuild_WithTimestamp() throws Exception {
     AdaptrisMessage msg = createMessage();
-    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder().withAddTimestampField("timestamp");
-    builder.setBufferSize(4096);
+    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder().withBufferSize(4096).withAddTimestampField("timestamp");
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
@@ -143,6 +147,32 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     try ( CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       fail();
     } catch (ProduceException expected) {
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testBuild_DoubleIterator() throws Exception {
+    AdaptrisMessage msg = createMessage();
+    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder();
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
+      Iterator<DocumentWrapper> itr = docs.iterator();
+      assertTrue(itr.hasNext());
+      assertTrue(itr.hasNext());
+      docs.iterator();
+      fail();
+    }
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testBuild_BadUniqueIdPath() throws Exception {
+    AdaptrisMessage msg = createMessage();
+    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder().withUniqueIdJsonPath("$.blahblah");
+    int count = 0;
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
+      Iterator<DocumentWrapper> itr = docs.iterator();
+      itr.hasNext();
+      fail();
     }
   }
 

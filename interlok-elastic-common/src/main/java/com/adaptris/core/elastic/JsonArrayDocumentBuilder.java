@@ -16,18 +16,23 @@
 
 package com.adaptris.core.elastic;
 
+import static com.adaptris.core.elastic.JsonHelper.get;
+import static com.adaptris.core.elastic.JsonHelper.getQuietly;
 import static org.apache.commons.lang.StringUtils.isBlank;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
@@ -44,7 +49,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
@@ -125,6 +129,11 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     this.bufferSize = b;
   }
 
+  public JsonArrayDocumentBuilder withBufferSize(Integer i) {
+    setBufferSize(i);
+    return this;
+  }
+
   int bufferSize() {
     return NumberUtils.toIntDefaultIfNull(getBufferSize(), DEFAULT_BUFFER_SIZE);
   }
@@ -170,7 +179,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     return StringUtils.defaultIfBlank(getUniqueIdJsonPath(), UID_PATH);
   }
 
-
   private class JsonDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator<DocumentWrapper> {
     private final JsonParser parser;
     private final ObjectMapper mapper;
@@ -192,37 +200,25 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
       return result;
     }
 
-    private DocumentWrapper buildNext() throws IOException {
+    private DocumentWrapper buildNext() {
       DocumentWrapper result = null;
-      if (parser.nextToken() == JsonToken.START_OBJECT) {
-        ObjectNode node = addTimestamp(mapper.readTree(parser));
-        // Add the timestamp before we start futzing with jsonBuilder...
-        addTimestamp(node);
-        String jsonString = node.toString();
-        XContentBuilder jsonContent = jsonBuilder(jsonString);
-        ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
-        result = new DocumentWrapper(get(ctx, uidPath()), jsonContent)
-            .withRouting(getQuietly(ctx, getRoutingJsonPath()));
-      }
-      return result;
-    }
-
-    private String get(ReadContext ctx, String path) {
-      return ctx.read(path);
-    }
-
-    private String getQuietly(ReadContext ctx, String path) {
-      String result = null;
-      if (isBlank(path)) {
-        return null;
-      }
       try {
-        result = get(ctx, path);
-      } catch (PathNotFoundException e) {
-        result = null;
+        if (parser.nextToken() == JsonToken.START_OBJECT) {
+          ObjectNode node = addTimestamp(mapper.readTree(parser));
+          // Add the timestamp before we start futzing with jsonBuilder...
+          addTimestamp(node);
+          String jsonString = node.toString();
+          XContentBuilder jsonContent = jsonBuilder(jsonString);
+          ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
+          result = new DocumentWrapper(get(ctx, uidPath()), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
+        }
+      } catch (Exception e) {
+        log.warn("Could not construct next DocumentWrapper; badly formed JSON?", e);
+        throw JsonHelper.wrapAsRuntimeException(e);
       }
       return result;
     }
+
 
     @Override
     public Iterator<DocumentWrapper> iterator() {
@@ -236,13 +232,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     @Override
     public boolean hasNext() {
       if (nextMessage == null) {
-        try {
-          nextMessage = buildNext();
-        }
-        catch (IOException e) {
-          log.warn("Could not construct next DocumentWrapper; badly formed JSON?", e);
-          throw new RuntimeException("Could not construct next DocumentWrapper", e);
-        }
+        nextMessage = buildNext();
       }
       return nextMessage != null;
     }

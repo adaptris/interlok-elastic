@@ -1,12 +1,20 @@
 package com.adaptris.core.elastic;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.EnumSet;
+import java.util.Iterator;
 
 import org.elasticsearch.common.Strings;
 import org.junit.Test;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
+import com.adaptris.core.ProduceException;
+import com.adaptris.core.stubs.DefectiveMessageFactory;
+import com.adaptris.core.stubs.DefectiveMessageFactory.WhenToBreak;
 import com.adaptris.core.util.CloseableIterable;
 import com.jayway.jsonpath.ReadContext;
 
@@ -41,6 +49,40 @@ public abstract class CsvBuilderCase extends BuilderCase {
     assertEquals(5, count);
   }
 
+
+  @Test(expected = RuntimeException.class)
+  public void testBuild_Invalid_UniqueIdField() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    CSVDocumentBuilderImpl documentBuilder = createBuilder().withUniqueIdField(99);
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
+      Iterator itr = docs.iterator();
+      assertTrue(itr.hasNext());
+      itr.next();
+      fail();
+    }
+  }
+
+  @Test(expected = ProduceException.class)
+  public void testBuild_ProduceException() throws Exception {
+    AdaptrisMessage msg = new DefectiveMessageFactory(EnumSet.of(WhenToBreak.INPUT, WhenToBreak.OUTPUT)).newMessage(CSV_INPUT);
+    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    CSVDocumentBuilderImpl documentBuilder = createBuilder();
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
+    }
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testBuild_DoubleIterator() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    CSVDocumentBuilderImpl documentBuilder = createBuilder();
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
+      docs.iterator();
+      docs.iterator();
+      fail();
+    }
+  }
 
   protected abstract CSVDocumentBuilderImpl createBuilder();
 

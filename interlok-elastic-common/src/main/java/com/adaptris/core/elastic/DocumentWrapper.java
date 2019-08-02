@@ -53,8 +53,7 @@ public class DocumentWrapper {
   }
 
   public DocumentWrapper withAction(String s) {
-    setAction(DocumentAction.valueOf(s));
-    return this;
+    return withAction(DocumentAction.valueOf(s));
   }
 
   public DocumentWrapper withAction(DocumentAction a) {

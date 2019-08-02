@@ -83,9 +83,15 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     this.format = Args.notNull(csvFormat, "format");
   }
 
+  public <T extends CSVDocumentBuilderImpl> T withFormat(FormatBuilder format) {
+    setFormat(format);
+    return (T) this;
+  }
+
   public Integer getUniqueIdField() {
     return uniqueIdField;
   }
+
 
   /**
    * Specify which field is considered the unique-id
@@ -95,6 +101,12 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   public void setUniqueIdField(Integer i) {
     this.uniqueIdField = i;
   }
+
+  public <T extends CSVDocumentBuilderImpl> T withUniqueIdField(Integer i) {
+    setUniqueIdField(i);
+    return (T) this;
+  }
+
 
   public String getAddTimestampField() {
     return addTimestampField;
@@ -116,13 +128,27 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
 
 
   protected void addTimestamp(XContentBuilder b) throws IOException {
-    if (!isBlank(addTimestampField)) {
-      b.field(addTimestampField, new Date().getTime());
+    if (!isBlank(getAddTimestampField())) {
+      b.field(getAddTimestampField(), new Date().getTime());
     }
   }
 
   protected int uniqueIdField() {
     return NumberUtils.toIntDefaultIfNull(getUniqueIdField(), 0);
+  }
+
+
+  public FieldNameMapper getFieldNameMapper() {
+    return fieldNameMapper;
+  }
+
+  public void setFieldNameMapper(FieldNameMapper fieldNameMapper) {
+    this.fieldNameMapper = Args.notNull(fieldNameMapper, "fieldNameMapper");
+  }
+
+  public <T extends CSVDocumentBuilderImpl> T withFieldNameMapper(FieldNameMapper s) {
+    setFieldNameMapper(s);
+    return (T) this;
   }
 
   protected List<String> buildHeaders(CSVRecord hdrRec) {
@@ -152,14 +178,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   }
 
   protected abstract CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception;
-  
-  public FieldNameMapper getFieldNameMapper() {
-    return fieldNameMapper;
-  }
 
-  public void setFieldNameMapper(FieldNameMapper fieldNameMapper) {
-    this.fieldNameMapper = Args.notNull(fieldNameMapper, "fieldNameMapper");
-  }
 
   protected abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator {
     protected CSVParser parser;

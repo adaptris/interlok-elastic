@@ -18,7 +18,6 @@ package com.adaptris.core.elastic;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +41,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <p>
  * The document that is created contains the following characteristics
  * <ul>
- * <li>The first record of the CSV is assumed to be a header row, and is used as the fieldName for each entry</li>
+ * <li>The first record of the CSV is usually assumed to be a header row, and is used as the fieldName for each entry. If
+ * {@code use-header-record} is marked as false, then fields will be generated according to their position.</li>
  * <li>The "unique-id" for the document is derived from the specified column, duplicates may have unexpected results depending on
  * your configuration.</li>
  * </ul>
@@ -115,7 +115,7 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
           idField = uniqueIdField();
         }
         else {
-          throw new IllegalArgumentException("unique-id field > number of fields in record");
+          throw new Exception("unique-id field > number of fields in record");
         }
         String uniqueId = record.get(idField);
         XContentBuilder builder = jsonBuilder();
@@ -130,7 +130,7 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
 
         result = new DocumentWrapper(uniqueId, builder);
       }
-      catch (IOException e) {
+      catch (Exception e) {
         throw new RuntimeException(e);
       }
       return result;

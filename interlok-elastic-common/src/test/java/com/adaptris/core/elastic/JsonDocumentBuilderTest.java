@@ -20,9 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import org.apache.commons.io.IOUtils;
+
 import org.elasticsearch.common.Strings;
 import org.junit.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
@@ -66,19 +67,12 @@ public class JsonDocumentBuilderTest extends BuilderCase {
     assertEquals(1, count);
   }
 
-  @Test
-  @SuppressWarnings("deprecation")
+  @Test(expected = ProduceException.class)
   public void testBuild_NotJson() throws Exception {
-    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("Hello World");
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("[{\"Hello\":\"World\"}]");
     JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder();
-    CloseableIterable<DocumentWrapper> docs = null;
-    try {
-      docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg));
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       fail();
-    } catch (ProduceException expected) {
-
-    } finally {
-      IOUtils.closeQuietly(docs);
     }
   }
 

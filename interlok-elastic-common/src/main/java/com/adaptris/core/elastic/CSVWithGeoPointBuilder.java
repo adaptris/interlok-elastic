@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -46,10 +47,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <p>
  * The document that is created contains the following characteristics
  * <ul>
- * <li>The first record of the CSV is assumed to be a header row, and is used as the fieldName for each entry</li>
+ * <li>The first record of the CSV is assumed to be a header row, and is used as the fieldName for each entry. There is no
+ * equivalent of {@code use-header-record} from {@link CSVDocumentBuilder} since we have to know which fields will form the
+ * {@code geo_point} fields.</li>
  * <li>The "unique-id" for the document is derived from the specified column, duplicates may have unexpected results depending on
  * your configuration; generally will be an updated version number</li>
- * <li>Any fields which matching "latitude"/"longitude" are aggregated and created as a {@code location} field.
+ * <li>Any fields which matching "latitude"/"longitude" are aggregated and created as a {@code geo_point} field.
  * </ul>
  * </p>
  * 
@@ -89,6 +92,12 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     this.latitudeFieldNames = latitudeFieldNames;
   }
 
+  public CSVWithGeoPointBuilder withLatitudeFieldNames(String s) {
+    setLatitudeFieldNames(s);
+    return this;
+  }
+
+
   private String latitudeFieldNames() {
     return ObjectUtils.defaultIfNull(getLatitudeFieldNames(), "latitude,lat");
   }
@@ -101,6 +110,11 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     this.longitudeFieldNames = longitudeFieldNames;
   }
   
+  public CSVWithGeoPointBuilder withLongitudeFieldNames(String s) {
+    setLongitudeFieldNames(s);
+    return this;
+  }
+
   private String longitudeFieldNames() {
     return ObjectUtils.defaultIfNull(getLongitudeFieldNames(), "longitude,lon");
   }
@@ -113,6 +127,11 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     this.locationFieldName = locationFieldName;
   }
   
+  public CSVWithGeoPointBuilder withLocationFieldName(String s) {
+    setLocationFieldName(s);
+    return this;
+  }
+
   private String locationFieldName() {
     return ObjectUtils.defaultIfNull(getLocationFieldName(), "location");
   }
@@ -144,7 +163,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
           idField = uniqueIdField();
         }
         else {
-          throw new IllegalArgumentException("unique-id field > number of fields in record");
+          throw new Exception("unique-id field > number of fields in record");
         }
         String uniqueId = record.get(idField);
         XContentBuilder builder = jsonBuilder();
@@ -153,7 +172,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
         addTimestamp(builder);
         
         for (int i = 0; i < record.size(); i++) {
-          String fieldName = headers.size() > 0 ? headers.get(i) : "field_" + i;
+          String fieldName = headers.get(i);
           String data = record.get(i);
           if (!latLong.isLatOrLong(fieldName)) {
             builder.field(getFieldNameMapper().map(fieldName), new Text(data));
@@ -163,7 +182,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
         builder.endObject();
         result = new DocumentWrapper(uniqueId, builder);
       }
-      catch (IOException e) {
+      catch (Exception e) {
         throw new RuntimeException(e);
       }
       return result;
@@ -191,7 +210,8 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     }
 
     void addLatLong(XContentBuilder builder, CSVRecord record) throws IOException {
-      if (lat == -1 || lon == -1) {
+      if (BooleanUtils.or(new boolean[] {lat == -1, lon == -1})) {
+        // nothing to do.
         return;
       }
       String latitude = record.get(lat);
