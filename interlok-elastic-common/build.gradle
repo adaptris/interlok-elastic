@@ -1,0 +1,61 @@
+ext {
+  componentName='Interlok Elastic/Common'
+}
+
+dependencies {
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+jar {
+  manifest {
+    attributes("Built-By": System.getProperty('user.name'),
+              "Build-Jdk": System.getProperty('java.version'),
+              "Implementation-Title": componentName,
+              "Implementation-Version": project.version,
+              "Implementation-Vendor-Id": project.group,
+              "Implementation-Vendor": organizationName)
+  }
+}
+
+publishing {
+  publications {
+      mavenJava(MavenPublication) {
+          from components.java
+
+          artifact javadocJar { classifier "javadoc" }
+          artifact sourcesJar { classifier "sources" }
+          pom.withXml {
+            asNode().appendNode("name", componentName)
+            asNode().appendNode("description", "Elasticsearch components that are not transport specific")
+            def properties = asNode().appendNode("properties")
+            properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
+            properties.appendNode("target", "3.9.1+")
+            properties.appendNode("license", "false")
+            properties.appendNode("tags", "elastic,elasticsearch")
+          }
+      }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
