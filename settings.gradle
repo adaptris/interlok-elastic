@@ -1,0 +1,3 @@
+rootProject.name = 'interlok-elastic'
+include 'interlok-elastic-common'
+include 'interlok-elastic-rest'
