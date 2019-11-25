@@ -3,6 +3,7 @@ ext {
 }
 
 dependencies {
+  implementation ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
