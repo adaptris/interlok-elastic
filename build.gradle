@@ -228,7 +228,7 @@ subprojects {
       xml.enabled = false
       html.enabled = true
     }
-    excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
+    // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
   }
 
   check.dependsOn jacocoTestReport
