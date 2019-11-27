@@ -19,31 +19,28 @@ package com.adaptris.core.elastic;
 import static com.adaptris.core.elastic.JsonHelper.get;
 import static com.adaptris.core.elastic.JsonHelper.getQuietly;
 import static org.apache.commons.lang.StringUtils.isBlank;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
+import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
 import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
-import com.adaptris.util.NumberUtils;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.core.JsonToken;
+import com.adaptris.core.util.LoggingHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
@@ -55,7 +52,7 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Parse a json array and create documents from it for elasticsearch
+ * Parse a json array (or json lines format)and create documents from it for elasticsearch
  * 
  * <p>
  * The unique-id for each document created is derived from the {@link JsonArrayDocumentBuilder#getUniqueIdJsonPath()} which defaults
@@ -66,22 +63,25 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("elastic-json-array-document-builder")
-@ComponentProfile(summary = "Build documents for elasticsearch from a existing JSON array", since = "3.9.1")
+@ComponentProfile(summary = "Build documents for elasticsearch from a existing JSON array/JSON lines doc", since = "3.9.1")
+@DisplayOrder(order = {"jsonStyle", "addTimestampField", "uniqueIdJsonPath", "routingJsonPath"})
 public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
-  private static final int DEFAULT_BUFFER_SIZE = 8192;
   public static final String UID_PATH = "$.uniqueid";
 
-  private transient Logger log = LoggerFactory.getLogger(this.getClass());
-
-  @AdvancedConfig
-  @InputFieldDefault(value = "8192")
+  @AdvancedConfig(rare = true)
+  @Deprecated
+  @Removal(version = "3.10.0")
   private Integer bufferSize;
   @AdvancedConfig
   @InputFieldDefault(value = UID_PATH)
   private String uniqueIdJsonPath;
   @AdvancedConfig
   private String routingJsonPath;
+  @InputFieldDefault(value = "JSON_ARRAY")
+  private JsonStyle jsonStyle;
+
+  private transient boolean bufferSizeWarningLogged = false;
 
   public JsonArrayDocumentBuilder() {
 
@@ -90,14 +90,12 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
     try {
-      ObjectMapper mapper = new ObjectMapper();
-      // The buffered read will be closed during the iterator close.
-      BufferedReader buf = new BufferedReader(msg.getReader(), bufferSize()); // lgtm
-      JsonParser parser = mapper.getFactory().createParser(buf).configure(Feature.AUTO_CLOSE_SOURCE, true);
-      if (parser.nextToken() != JsonToken.START_ARRAY) {
-        throw new ProduceException("Expected an array");
+      if (getBufferSize() != null) {
+        LoggingHelper.logWarning(bufferSizeWarningLogged, () -> {
+          bufferSizeWarningLogged = true;
+        }, "BufferSize is deprecated, and will be ignored");
       }
-      return new JsonDocumentWrapper(mapper, parser);
+      return new JsonDocumentWrapper(jsonStyle(), msg);
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
@@ -112,6 +110,35 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     return b;
   }
 
+  public <T extends JsonArrayDocumentBuilder> T withJsonStyle(JsonStyle p) {
+    setJsonStyle(p);
+    return (T) this;
+  }
+
+  /**
+   * Specify how the payload is parsed to provide JSON objects.
+   * 
+   * @param p the provider; default is JSON_ARRAY.
+   */
+  public void setJsonStyle(JsonStyle p) {
+    jsonStyle = p;
+  }
+
+  public JsonStyle getJsonStyle() {
+    return jsonStyle;
+  }
+
+  protected JsonStyle jsonStyle() {
+    return ObjectUtils.defaultIfNull(getJsonStyle(), JsonStyle.JSON_ARRAY);
+  }
+
+  /**
+   * 
+   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly, this setting is ignored
+   * 
+   */
+  @Deprecated
+  @Removal(version = "3.10.0", message = "To support JSON lines, we no longer parse the JSON directly, this setting is ignored")
   public Integer getBufferSize() {
     return bufferSize;
   }
@@ -124,18 +151,24 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    * </p>
    * 
    * @param b the buffer size (default is 8192).
+   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
    */
+  @Deprecated
+  @Removal(version = "3.10.0", message = "To support JSON lines, we no longer parse the JSON directly, this setting is ignored")
   public void setBufferSize(Integer b) {
     this.bufferSize = b;
   }
 
+  /**
+   * 
+   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
+   * @return
+   */
+  @Deprecated
+  @Removal(version = "3.10.0")
   public JsonArrayDocumentBuilder withBufferSize(Integer i) {
     setBufferSize(i);
     return this;
-  }
-
-  int bufferSize() {
-    return NumberUtils.toIntDefaultIfNull(getBufferSize(), DEFAULT_BUFFER_SIZE);
   }
 
   public String getUniqueIdJsonPath() {
@@ -180,17 +213,20 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
   }
 
   private class JsonDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator<DocumentWrapper> {
-    private final JsonParser parser;
-    private final ObjectMapper mapper;
 
     private DocumentWrapper nextMessage;
+    private final ObjectMapper mapper;
     private transient Configuration jsonConfig = new Configuration.ConfigurationBuilder().jsonProvider(new JsonSmartJsonProvider())
         .mappingProvider(new JacksonMappingProvider()).options(EnumSet.noneOf(Option.class)).build();
     private boolean iteratorInvoked = false;
+    private final CloseableIterable<AdaptrisMessage> jsonIterable;
+    private final Iterator<AdaptrisMessage> jsonIterator;
 
-    public JsonDocumentWrapper(ObjectMapper mapper, JsonParser parser) {
-      this.mapper = mapper;
-      this.parser = parser;
+
+    public JsonDocumentWrapper(JsonStyle style, AdaptrisMessage msg) throws Exception {
+      mapper = new ObjectMapper();
+      jsonIterable = style.createIterator(msg);
+      jsonIterator = jsonIterable.iterator();
     }
 
     @Override
@@ -203,14 +239,15 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     private DocumentWrapper buildNext() {
       DocumentWrapper result = null;
       try {
-        if (parser.nextToken() == JsonToken.START_OBJECT) {
-          ObjectNode node = addTimestamp(mapper.readTree(parser));
-          // Add the timestamp before we start futzing with jsonBuilder...
-          addTimestamp(node);
-          String jsonString = node.toString();
-          XContentBuilder jsonContent = jsonBuilder(jsonString);
-          ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
-          result = new DocumentWrapper(get(ctx, uidPath()), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
+        if (jsonIterator.hasNext()) {
+          AdaptrisMessage msg = jsonIterator.next();
+          try (InputStream in = msg.getInputStream()) {
+            ObjectNode node = addTimestamp((ObjectNode) mapper.readTree(in));
+            String jsonString = node.toString();
+            XContentBuilder jsonContent = jsonBuilder(jsonString);
+            ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
+            result = new DocumentWrapper(get(ctx, uidPath()), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
+          }
         }
       } catch (Exception e) {
         log.warn("Could not construct next DocumentWrapper; badly formed JSON?", e);
@@ -240,9 +277,9 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     @Override
     @SuppressWarnings("deprecation")
     public void close() throws IOException {
-      IOUtils.closeQuietly(parser);
+      IOUtils.closeQuietly(jsonIterable);
     }
-  }
 
+  }
 
 }
