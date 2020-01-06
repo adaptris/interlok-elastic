@@ -2,7 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
-  id 'com.github.spotbugs' version '2.0.0' apply false
+  id 'com.github.spotbugs' version '3.0.0' apply false
 }
 
 ext {
@@ -21,11 +21,11 @@ ext {
   componentName='Interlok Elasticsearch'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.28'
-  elasticVersion = '7.3.1'
+  slf4jVersion = '1.7.29'
+  elasticVersion = '7.4.2'
   log4j2Version = '2.12.1'
   junitJupiterVersion = '5.5.2'
-  mockitoVersion = '3.1.0'
+  mockitoVersion = '3.2.0'
 }
 
 
@@ -37,6 +37,25 @@ ext.hasGraphViz = { ->
   return System.getenv("PATH").split(File.pathSeparator).any{
     java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
   }
+}
+
+ext.gitBranchNameOrTimestamp = { branchName ->
+  if (branchName.equals("HEAD") || branchName.equals("develop") || branchName.startsWith("release")) {
+    return new Date().format('HH:mm:ss z');
+  }
+  return branchName;
+}
+
+ext.buildInfo = { ->
+   new ByteArrayOutputStream().withStream { os ->
+      exec {
+        executable = "git"
+        args = ["rev-parse", "--abbrev-ref", "HEAD"]
+        standardOutput = os
+      }
+      def branchName = os.toString().replaceAll("\r", "").replaceAll("\n", "").trim();
+      return gitBranchNameOrTimestamp(branchName);
+    }
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -97,11 +116,11 @@ subprojects {
     implementation ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     implementation ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.0")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.1")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.4")
+    implementation ("joda-time:joda-time:2.10.5")
 
     implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion")
     implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion")
@@ -148,10 +167,6 @@ subprojects {
     useJUnitPlatform()
   }
 
-  jacoco {
-    toolVersion="0.8.3"
-  }
-
   jacocoTestReport {
     reports {
       xml.enabled true
@@ -176,6 +191,7 @@ subprojects {
         entry(key: 'groupId', value: project.group)
         entry(key: 'artifactId', value: project.name)
         entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
+        entry(key: 'build.info', value: buildInfo())
       }
     }
   }
@@ -212,7 +228,7 @@ subprojects {
       xml.enabled = false
       html.enabled = true
     }
-    excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
+    // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
   }
 
   check.dependsOn jacocoTestReport
