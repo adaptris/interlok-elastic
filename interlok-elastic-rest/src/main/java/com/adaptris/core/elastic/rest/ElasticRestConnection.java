@@ -45,6 +45,7 @@ public class ElasticRestConnection extends NoOpConnection implements TransportCl
   @SuppressWarnings("deprecation")
   protected void closeConnection() {
     IOUtils.closeQuietly(transportClient);
+    transportClient = null;
   }
 
   @Override
