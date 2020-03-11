@@ -25,7 +25,7 @@ ext {
   elasticVersion = '7.4.2'
   log4j2Version = '2.13.1'
   junitJupiterVersion = '5.6.0'
-  mockitoVersion = '3.2.4'
+  mockitoVersion = '3.3.0'
 }
 
 
