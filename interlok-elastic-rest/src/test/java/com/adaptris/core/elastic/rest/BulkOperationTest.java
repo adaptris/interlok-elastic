@@ -16,9 +16,13 @@
 
 package com.adaptris.core.elastic.rest;
 
-import static org.mockito.Matchers.anyObject;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyObject;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.common.unit.TimeValue;
+import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -44,11 +48,11 @@ public class BulkOperationTest extends ProducerCase {
           + System.lineSeparator()
           + "UID-5,26N35S,Rape Winter,Fungicides,12,20150314,,200,Kilograms per Hectare,,0,52.71896363632868,-1.2391368098336788,233,217"
           + System.lineSeparator();
-
-  public BulkOperationTest(String name) {
-    super(name);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
+  @Test
   public void testRefreshPolicy() throws Exception {
     BulkOperation producer = new BulkOperation();
     assertNull(producer.getRefreshPolicy());
@@ -57,6 +61,7 @@ public class BulkOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testIndex() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
@@ -69,6 +74,7 @@ public class BulkOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testUpdate() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
@@ -80,6 +86,7 @@ public class BulkOperationTest extends ProducerCase {
     ServiceCase.execute(prod, msg);
   }
 
+  @Test
   public void testDelete() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
@@ -91,6 +98,7 @@ public class BulkOperationTest extends ProducerCase {
     ServiceCase.execute(prod, msg);
   }
 
+  @Test
   public void testUpsert() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
@@ -102,6 +110,7 @@ public class BulkOperationTest extends ProducerCase {
     ServiceCase.execute(prod, msg);
   }
 
+  @Test
   public void testService_BulkHasException() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(true);
@@ -119,6 +128,7 @@ public class BulkOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testService_InvalidAction() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     ElasticRestConnection conn = new PreConfiguredConnection(client);

@@ -6,8 +6,8 @@ plugins {
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.9-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.9-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.10-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.10-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -21,11 +21,11 @@ ext {
   componentName='Interlok Elasticsearch'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.29'
+  slf4jVersion = '1.7.30'
   elasticVersion = '7.4.2'
-  log4j2Version = '2.12.1'
-  junitJupiterVersion = '5.5.2'
-  mockitoVersion = '3.2.0'
+  log4j2Version = '2.13.0'
+  junitJupiterVersion = '5.6.0'
+  mockitoVersion = '3.2.4'
 }
 
 
@@ -116,7 +116,8 @@ subprojects {
     implementation ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     implementation ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.1")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.2")
+    implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
@@ -131,14 +132,14 @@ subprojects {
       because 'allows JUnit 3 and JUnit 4 tests to run'
     }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.5.2") {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.0") {
       because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
-    testImplementation ('junit:junit:4.12')
+    testImplementation ('junit:junit:4.13')
     testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true}
     testImplementation ("org.apache.logging.log4j:log4j-core:$log4j2Version")
     testImplementation ("org.apache.logging.log4j:log4j-1.2-api:$log4j2Version")

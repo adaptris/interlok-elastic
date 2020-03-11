@@ -18,7 +18,7 @@ package com.adaptris.core.elastic;
 
 import static com.adaptris.core.elastic.JsonHelper.get;
 import static com.adaptris.core.elastic.JsonHelper.getQuietly;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import com.adaptris.annotation.AdvancedConfig;

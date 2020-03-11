@@ -16,10 +16,12 @@
 
 package com.adaptris.core.elastic.rest;
 
-import static org.mockito.Matchers.anyObject;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyObject;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
+import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -34,7 +36,10 @@ import com.adaptris.core.elastic.actions.ConfiguredAction;
 public class SingleOperationTest extends ProducerCase {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--" + "\n-->\n";
-
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
+  }
   @Override
   protected Object retrieveObjectForSampleConfig() {
     ElasticRestConnection esc = new ElasticRestConnection("http://localhost:9200");
@@ -49,6 +54,7 @@ public class SingleOperationTest extends ProducerCase {
     return super.getExampleCommentHeader(o) + EXAMPLE_COMMENT_HEADER;
   }
 
+  @Test
   public void testIndex() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     IndexResponse response = mockIndexResponse();
@@ -61,6 +67,7 @@ public class SingleOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testUpdate() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     UpdateResponse response = mockUpdateResponse();
@@ -73,6 +80,7 @@ public class SingleOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testDelete() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     DeleteResponse response = mockDeleteResponse();
@@ -85,6 +93,7 @@ public class SingleOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testUpsert() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     UpdateResponse response = mockUpdateResponse();
@@ -97,6 +106,7 @@ public class SingleOperationTest extends ProducerCase {
   }
 
 
+  @Test
   public void testService_Exception() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
