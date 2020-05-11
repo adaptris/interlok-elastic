@@ -2,7 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
-  id 'com.github.spotbugs' version '3.0.0' apply false
+  id 'com.github.spotbugs' version '4.0.5' apply false
 }
 
 ext {
@@ -22,10 +22,10 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  elasticVersion = '7.4.2'
-  log4j2Version = '2.13.0'
-  junitJupiterVersion = '5.6.0'
-  mockitoVersion = '3.2.4'
+  elasticVersion = '7.6.2'
+  log4j2Version = '2.13.2'
+  junitJupiterVersion = '5.6.2'
+  mockitoVersion = '3.3.3'
 }
 
 
@@ -103,6 +103,11 @@ subprojects {
     all*.exclude group: 'net.sf.saxon', module: 'saxon'
     all*.exclude group: 'org.codehaus.woodstox'
     all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+    // INTERLOK-3197 exclude old javax.mail
+    all*.exclude group: 'com.sun.mail', module: 'javax.mail'
+    all*.exclude group: 'javax.validation', module: 'validation-api'
+    all*.exclude group: 'javax.activation', module: 'activation'
+    all*.exclude group: 'javax.activation', module: 'javax.activation-api'
   }
 
   configurations.all {
@@ -116,15 +121,24 @@ subprojects {
     implementation ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     implementation ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.2")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.3")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.5")
+    implementation ("joda-time:joda-time:2.10.6")
 
-    implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion")
-    implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion")
+    implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
+      exclude group: "org.yaml", module: "snakeyaml"
+    }
+    implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion") {
+      exclude group: "commons-codec", module: "commons-codec"
+      exclude group: "org.apache.httpcomponents", module: "httpclient"
+    }
+
+    implementation ("org.yaml:snakeyaml:1.26")
+    implementation ("commons-codec:commons-codec:1.13")
+    implementation ("org.apache.httpcomponents:httpclient:4.5.12")
 
     testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
@@ -132,7 +146,7 @@ subprojects {
       because 'allows JUnit 3 and JUnit 4 tests to run'
     }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.0") {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.2") {
       because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
@@ -211,26 +225,26 @@ subprojects {
     into offlineJavadocPackageDir
   }
 
-  spotbugs {
+  spotbugsMain {
+    effort = "max"
+    reportLevel = "high"
     // showProgress = "true"
     effort = "max"
     // Ignore failures?
     // ignoreFailures = false
-
-    // We only care about "high priority" issues...
-    reportLevel = "high"
-  }
+    reports {
+      xml {
+        enabled = false
+      }
+      html {
+        enabled = true
+      }
+    }
+ }
 
   // disable spotbugsTests which checks our test code..
   spotbugsTest.enabled = false
 
-  tasks.withType(com.github.spotbugs.SpotBugsTask) {
-    reports {
-      xml.enabled = false
-      html.enabled = true
-    }
-    // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
-  }
 
   check.dependsOn jacocoTestReport
   javadoc.dependsOn offlinePackageList
