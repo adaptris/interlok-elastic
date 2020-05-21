@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.apache.commons.io.IOUtils;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.NoOpConnection;
-import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Connect to elasticsearch via their high level REST client
@@ -21,9 +24,16 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @ComponentProfile(summary = "Connect to elasticsearch via their high level REST client", since = "3.9.1")
 public class ElasticRestConnection extends NoOpConnection implements TransportClientProvider {
 
-  @XStreamImplicit(itemFieldName = "transport-url")
+  /** The list of URLs that we try to connect to.
+   * 
+   */
+  @XStreamImplicit(itemFieldName = "transport-url")  
   @Size(min = 1)
   @Valid
+  @Getter
+  @Setter
+  @NotNull
+  @NonNull
   private List<String> transportUrls;
 
   // transient for now, but will probably need to be exposed since we
@@ -54,14 +64,6 @@ public class ElasticRestConnection extends NoOpConnection implements TransportCl
       transportClient = getElasticClientCreator().createTransportClient(getTransportUrls());
     }
     return transportClient;
-  }
-
-  public List<String> getTransportUrls() {
-    return transportUrls;
-  }
-
-  public void setTransportUrls(List<String> transports) {
-    this.transportUrls = Args.notNull(transports, "Transport URLS");
   }
 
   private ElasticClientCreator getElasticClientCreator() {

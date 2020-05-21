@@ -2,6 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
+  id "io.freefair.lombok" version "5.1.0" apply false
   id 'com.github.spotbugs' version '4.2.1' apply false
   id 'org.owasp.dependencycheck' version '5.3.2.1' apply false
 }
@@ -78,11 +79,13 @@ subprojects {
   apply plugin: "nebula.optional-base"
   apply plugin: 'com.github.spotbugs'
   apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: "io.freefair.lombok"
 
   sourceCompatibility = 1.8
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
+  generateLombokConfig.enabled = false
 
   repositories {
     mavenCentral()
@@ -261,6 +264,15 @@ subprojects {
   // disable spotbugsTests which checks our test code..
   spotbugsTest.enabled = false
 
+
+  task lgtmCompile(type: JavaCompile, dependsOn: delombok) {
+    group 'Build'
+    description 'Compile for lgtm'
+
+    source = sourceSets.main.extensions.delombokTask
+    destinationDir = sourceSets.main.java.outputDir
+    classpath = project.sourceSets.main.compileClasspath
+  }
 
   check.dependsOn jacocoTestReport
   javadoc.dependsOn offlinePackageList

@@ -31,6 +31,8 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Builds a simple document for elastic search.
@@ -50,12 +52,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("elastic-simple-document-builder")
 @ComponentProfile(summary = "Build a document for elasticsearch using the raw payload and metadata", since = "3.9.1")
+@NoArgsConstructor
 public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
 
   private transient Logger log = LoggerFactory.getLogger(this.getClass());
-
-  public SimpleDocumentBuilder() {
-  }
 
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {

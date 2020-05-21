@@ -19,16 +19,14 @@ package com.adaptris.core.elastic;
 import static com.adaptris.core.elastic.JsonHelper.get;
 import static com.adaptris.core.elastic.JsonHelper.getQuietly;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
@@ -50,6 +48,9 @@ import com.jayway.jsonpath.ReadContext;
 import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Parse a json array (or json lines format)and create documents from it for elasticsearch
@@ -65,27 +66,55 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("elastic-json-array-document-builder")
 @ComponentProfile(summary = "Build documents for elasticsearch from a existing JSON array/JSON lines doc", since = "3.9.1")
 @DisplayOrder(order = {"jsonStyle", "addTimestampField", "uniqueIdJsonPath", "routingJsonPath"})
+@NoArgsConstructor
 public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
   public static final String UID_PATH = "$.uniqueid";
 
+  /**
+   * Internal buffer size.
+   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly and will be ignored.
+   */
   @AdvancedConfig(rare = true)
   @Deprecated
   @Removal(version = "3.10.0")
+  @Getter
+  @Setter
   private Integer bufferSize;
+  /**
+   * The json path to the unique id.
+   * 
+   * <p>
+   * If not specified explicitly then defaults to {@code $.uniqueid}
+   * </p>
+   */
   @AdvancedConfig
   @InputFieldDefault(value = UID_PATH)
+  @Getter
+  @Setter
   private String uniqueIdJsonPath;
+  /**
+   * Set the JSON path to extract the routing information.
+   * 
+   * 
+   */  
   @AdvancedConfig
+  @Getter
+  @Setter
   private String routingJsonPath;
+  /**
+   * Specify how the payload is parsed to provide JSON objects.
+   * 
+   * <p>
+   * If not specified defaults to {@code JSON_ARRAY}
+   * </p>
+   */ 
   @InputFieldDefault(value = "JSON_ARRAY")
+  @Getter
+  @Setter
   private JsonStyle jsonStyle;
 
   private transient boolean bufferSizeWarningLogged = false;
-
-  public JsonArrayDocumentBuilder() {
-
-  }
 
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
@@ -110,59 +139,20 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     return b;
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends JsonArrayDocumentBuilder> T withJsonStyle(JsonStyle p) {
     setJsonStyle(p);
     return (T) this;
-  }
-
-  /**
-   * Specify how the payload is parsed to provide JSON objects.
-   * 
-   * @param p the provider; default is JSON_ARRAY.
-   */
-  public void setJsonStyle(JsonStyle p) {
-    jsonStyle = p;
-  }
-
-  public JsonStyle getJsonStyle() {
-    return jsonStyle;
   }
 
   protected JsonStyle jsonStyle() {
     return ObjectUtils.defaultIfNull(getJsonStyle(), JsonStyle.JSON_ARRAY);
   }
 
-  /**
-   * 
-   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly, this setting is ignored
-   * 
-   */
-  @Deprecated
-  @Removal(version = "3.10.0", message = "To support JSON lines, we no longer parse the JSON directly, this setting is ignored")
-  public Integer getBufferSize() {
-    return bufferSize;
-  }
-
-  /**
-   * Set the internal buffer size.
-   * <p>
-   * This is used when; the default buffer size matches the default buffer size in {@link BufferedReader} and {@link BufferedWriter}
-   * , changes to the buffersize will impact performance and memory usage depending on the underlying operating system/disk.
-   * </p>
-   * 
-   * @param b the buffer size (default is 8192).
-   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
-   */
-  @Deprecated
-  @Removal(version = "3.10.0", message = "To support JSON lines, we no longer parse the JSON directly, this setting is ignored")
-  public void setBufferSize(Integer b) {
-    this.bufferSize = b;
-  }
 
   /**
    * 
    * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
-   * @return
    */
   @Deprecated
   @Removal(version = "3.10.0")
@@ -171,35 +161,9 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     return this;
   }
 
-  public String getUniqueIdJsonPath() {
-    return uniqueIdJsonPath;
-  }
-
-  /**
-   * Specify the json path to the unique id.
-   * 
-   * @param s the json path to the unique-id; if not specified {@code $.uniqueid}
-   */
-  public void setUniqueIdJsonPath(String s) {
-    this.uniqueIdJsonPath = s;
-  }
-
   public JsonArrayDocumentBuilder withUniqueIdJsonPath(String s) {
     setUniqueIdJsonPath(s);
     return this;
-  }
-
-  public String getRoutingJsonPath() {
-    return routingJsonPath;
-  }
-
-  /**
-   * Set the JSON path to extract the routing information.
-   * 
-   * @param path the path to routing information, defaults to null if not specified.
-   */
-  public void setRoutingJsonPath(String path) {
-    this.routingJsonPath = path;
   }
 
   public JsonArrayDocumentBuilder withRoutingJsonPath(String s) {
