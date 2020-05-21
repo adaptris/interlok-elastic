@@ -4,7 +4,8 @@ ext {
 }
 
 dependencies {
-  implementation ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
+  compile ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
+  compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

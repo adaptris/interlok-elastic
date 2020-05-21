@@ -5,6 +5,8 @@ ext {
 
 dependencies {
   compile project(':interlok-elastic-common')
+  compile ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
+
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
