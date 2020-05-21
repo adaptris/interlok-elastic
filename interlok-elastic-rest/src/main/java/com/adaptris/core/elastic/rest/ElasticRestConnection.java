@@ -58,6 +58,7 @@ public class ElasticRestConnection extends NoOpConnection implements TransportCl
   private transient TransportClient transportClient = null;
 
   public ElasticRestConnection() {
+    setTransportUrls(new ArrayList<String>());
     setElasticClientCreator(new ElasticRestClientCreator());
   }
 
