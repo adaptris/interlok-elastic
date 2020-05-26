@@ -29,31 +29,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.adaptris.annotation.AdvancedConfig;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
+@NoArgsConstructor
 public abstract class JsonDocumentBuilderImpl implements ElasticDocumentBuilder {
 
   protected transient Logger log = LoggerFactory.getLogger(this.getClass());
 
+  /**
+   * The field which you want to add the ms since epoch to.
+   * <p>
+   * If not explicitly specified, the timestamp will not be emitted
+   * </p>
+   */
   @AdvancedConfig
+  @Getter
+  @Setter
   private String addTimestampField;
 
-  public JsonDocumentBuilderImpl() {
-  }
 
-  public String getAddTimestampField() {
-    return addTimestampField;
-  }
-
-  /**
-   * Specify a value here to emit the current ms since epoch as the fields value.
-   * 
-   * @param s the fieldname (default null)
-   */
-  public void setAddTimestampField(String s) {
-    this.addTimestampField = s;
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends JsonDocumentBuilderImpl> T withAddTimestampField(String s) {
     setAddTimestampField(s);
     return (T) this;

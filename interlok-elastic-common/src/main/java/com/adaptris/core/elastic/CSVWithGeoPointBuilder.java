@@ -17,14 +17,12 @@
 package com.adaptris.core.elastic;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -32,7 +30,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
@@ -40,6 +37,8 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
 import com.adaptris.core.transform.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Builds a document for elastic search.
@@ -63,16 +62,40 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @ComponentProfile(summary = "Build documents for elasticsearch from a CSV document", since = "3.9.1")
 public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
 
+  /**
+   * A comma separated field name that should be considered the latitude field for a geopoint.
+   * <p>
+   * If not explicitly specified, defaults to {@code latitude,lat}
+   * </p>
+   */
   @AdvancedConfig
   @InputFieldDefault(value = "latitude,lat")
+  @Getter
+  @Setter
   private String latitudeFieldNames;
   
+  /**
+   * A comma separated field name that should be considered the longitude field for a geopoint.
+   * <p>
+   * If not explicitly specified, defaults to {@code longitude,lon}
+   * </p>
+   */
   @AdvancedConfig
   @InputFieldDefault(value = "longitude,lon")
+  @Getter
+  @Setter
   private String longitudeFieldNames;
   
+  /**
+   * The location field name within the elastic document.
+   * <p>
+   * If not explicitly specified, defaults to {@code location}
+   * </p>
+   */
   @AdvancedConfig
   @InputFieldDefault(value = "location")
+  @Getter
+  @Setter  
   private String locationFieldName;
 
   public CSVWithGeoPointBuilder() {
@@ -84,30 +107,13 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     setFormat(f);
   }
 
-  public String getLatitudeFieldNames() {
-    return latitudeFieldNames;
-  }
-
-  public void setLatitudeFieldNames(String latitudeFieldNames) {
-    this.latitudeFieldNames = latitudeFieldNames;
-  }
-
   public CSVWithGeoPointBuilder withLatitudeFieldNames(String s) {
     setLatitudeFieldNames(s);
     return this;
   }
 
-
   private String latitudeFieldNames() {
     return ObjectUtils.defaultIfNull(getLatitudeFieldNames(), "latitude,lat");
-  }
-  
-  public String getLongitudeFieldNames() {
-    return longitudeFieldNames;
-  }
-
-  public void setLongitudeFieldNames(String longitudeFieldNames) {
-    this.longitudeFieldNames = longitudeFieldNames;
   }
   
   public CSVWithGeoPointBuilder withLongitudeFieldNames(String s) {
@@ -119,14 +125,6 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     return ObjectUtils.defaultIfNull(getLongitudeFieldNames(), "longitude,lon");
   }
 
-  public String getLocationFieldName() {
-    return locationFieldName;
-  }
-
-  public void setLocationFieldName(String locationFieldName) {
-    this.locationFieldName = locationFieldName;
-  }
-  
   public CSVWithGeoPointBuilder withLocationFieldName(String s) {
     setLocationFieldName(s);
     return this;

@@ -35,6 +35,9 @@ import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.util.NumberUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Index/Delete/Update a document(s) to ElasticSearch.
@@ -62,17 +65,22 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 {
     "batchWindow", "documentBuilder", "action", "refreshPolicy"
 })
+@NoArgsConstructor
 public class BulkOperation extends SingleOperation {
 
   private static final int DEFAULT_BATCH_WINDOW = 10000;
-
+  /**
+   * The batch window which is the number of operations that make a bulk request before its
+   * executed.
+   * <p>
+   * If not specified explicitly then the default is 10000
+   * </p>
+   */
   @Min(0)
   @InputFieldDefault(value = "10000")
+  @Getter
+  @Setter
   private Integer batchWindow;
-
-  public BulkOperation() {
-    super();
-  }
 
   @Override
   protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
@@ -130,17 +138,6 @@ public class BulkOperation extends SingleOperation {
     }
     log.trace("Producing batch of {} requests took {}", count, response.getTook().toString());
     return;
-  }
-
-  public Integer getBatchWindow() {
-    return batchWindow;
-  }
-
-  /**
-   * @param b the batch window, which is the number of operations that make a bulk request before its executed.
-   */
-  public void setBatchWindow(Integer b) {
-    this.batchWindow = b;
   }
 
   public BulkOperation withBatchWindow(Integer i) {

@@ -2,12 +2,14 @@ package com.adaptris.core.elastic.fields;
 
 import com.adaptris.annotation.ComponentProfile;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.NoArgsConstructor;
 
 /**
  * @config elastic-uppercase-field-name-mapper
  */
 @XStreamAlias("elastic-uppercase-field-name-mapper")
 @ComponentProfile(summary = "Map a fieldname to its uppercase variant", since = "3.9.1")
+@NoArgsConstructor
 public class ToUpperCaseFieldNameMapper implements FieldNameMapper {
 
   @Override

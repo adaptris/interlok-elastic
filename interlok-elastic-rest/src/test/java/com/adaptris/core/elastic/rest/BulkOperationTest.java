@@ -19,7 +19,7 @@ package com.adaptris.core.elastic.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.*;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.common.unit.TimeValue;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class BulkOperationTest extends ProducerCase {
   public void testIndex() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
-    Mockito.when(client.bulk(anyObject())).thenReturn(response);
+    Mockito.when(client.bulk(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     BulkOperation p = createProducerForTests("INDEX").withBatchWindow(3);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -78,7 +78,7 @@ public class BulkOperationTest extends ProducerCase {
   public void testUpdate() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
-    Mockito.when(client.bulk(anyObject())).thenReturn(response);
+    Mockito.when(client.bulk(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     BulkOperation p = createProducerForTests("UPDATE").withBatchWindow(10);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -90,7 +90,7 @@ public class BulkOperationTest extends ProducerCase {
   public void testDelete() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
-    Mockito.when(client.bulk(anyObject())).thenReturn(response);
+    Mockito.when(client.bulk(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     BulkOperation p = createProducerForTests("DELETE").withBatchWindow(1);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -102,7 +102,7 @@ public class BulkOperationTest extends ProducerCase {
   public void testUpsert() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(false);
-    Mockito.when(client.bulk(anyObject())).thenReturn(response);
+    Mockito.when(client.bulk(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     BulkOperation p = createProducerForTests("UPSERT").withBatchWindow(1);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -114,7 +114,7 @@ public class BulkOperationTest extends ProducerCase {
   public void testService_BulkHasException() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     BulkResponse response = mockBulkResponse(true);
-    Mockito.when(client.bulk(anyObject())).thenReturn(response);
+    Mockito.when(client.bulk(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     BulkOperation p = createProducerForTests("UPSERT").withBatchWindow(1);
     StandaloneProducer prod = new StandaloneProducer(conn, p);

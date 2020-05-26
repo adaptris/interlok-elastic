@@ -2,6 +2,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
+  id "io.freefair.lombok" version "5.1.0" apply false
   id 'com.github.spotbugs' version '4.2.2' apply false
   id 'org.owasp.dependencycheck' version '5.3.2.1' apply false
 }
@@ -78,11 +79,13 @@ subprojects {
   apply plugin: "nebula.optional-base"
   apply plugin: 'com.github.spotbugs'
   apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: "io.freefair.lombok"
 
   sourceCompatibility = 1.8
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
+  generateLombokConfig.enabled = false
 
   repositories {
     mavenCentral()
@@ -118,9 +121,9 @@ subprojects {
   dependencies {
     annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-    implementation ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
-    implementation ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-    implementation ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
+    compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
+    compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
+    compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
     implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.0")
     implementation ("commons-collections:commons-collections:3.2.2")
@@ -155,10 +158,10 @@ subprojects {
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
     testImplementation ('junit:junit:4.13')
-    testCompile "org.slf4j:slf4j-simple:$slf4jVersion"
+    testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
     // exclude any log4j dependencies so that we can just use slf4j simple.
     // works around INTERLOk-3233
-    testCompile "com.adaptris:interlok-stubs:$interlokCoreVersion", {
+    testImplementation "com.adaptris:interlok-stubs:$interlokCoreVersion", {
       changing= true
       exclude group: "org.apache.logging.log4j"
     }
@@ -261,6 +264,15 @@ subprojects {
   // disable spotbugsTests which checks our test code..
   spotbugsTest.enabled = false
 
+
+  task lgtmCompile(type: JavaCompile, dependsOn: delombok) {
+    group 'Build'
+    description 'Compile for lgtm'
+
+    source = sourceSets.main.extensions.delombokTask
+    destinationDir = sourceSets.main.java.outputDir
+    classpath = project.sourceSets.main.compileClasspath
+  }
 
   check.dependsOn jacocoTestReport
   javadoc.dependsOn offlinePackageList

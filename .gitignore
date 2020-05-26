@@ -26,3 +26,5 @@ target
 bin
 .gradle
 gradle.properties
+interlok-elastic-common/src/main/generated
+interlok-elastic-rest/src/main/generated

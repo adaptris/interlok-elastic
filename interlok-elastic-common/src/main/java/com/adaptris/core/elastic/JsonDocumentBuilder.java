@@ -31,6 +31,9 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Creates a JSON document for elastic search.
@@ -50,15 +53,18 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("elastic-json-document-builder")
 @ComponentProfile(summary = "Build documents for elasticsearch from a existing JSON document", since = "3.9.1")
+@NoArgsConstructor
 public class JsonDocumentBuilder extends JsonDocumentBuilderImpl {
 
+  /**
+   * The routing for this document.
+   * 
+   */
   @AdvancedConfig
   @InputFieldHint(expression = true)
+  @Getter
+  @Setter
   private String routing;
-
-  public JsonDocumentBuilder() {
-    super();
-  }
 
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
@@ -77,19 +83,6 @@ public class JsonDocumentBuilder extends JsonDocumentBuilderImpl {
       throw ExceptionHelper.wrapProduceException(e);
     }
     return result;
-  }
-
-  public String getRouting() {
-    return routing;
-  }
-
-  /**
-   * Set the routing for this document.
-   * 
-   * @param routing the routing information (default is null)
-   */
-  public void setRouting(String routing) {
-    this.routing = routing;
   }
 
   public JsonDocumentBuilder withRouting(String r) {

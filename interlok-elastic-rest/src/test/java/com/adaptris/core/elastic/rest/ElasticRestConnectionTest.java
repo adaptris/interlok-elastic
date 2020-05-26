@@ -11,7 +11,8 @@ public class ElasticRestConnectionTest {
 
   @Test
   public void testLifecycle() throws Exception {
-    ElasticRestConnection conn = new ElasticRestConnection("http://localhost:9200");
+    ElasticRestConnection conn = new ElasticRestConnection("http://localhost:9200")
+        .withElasticClientCreator(new ElasticRestClientCreator());
     try {
       LifecycleHelper.initAndStart(conn);
     } finally {
