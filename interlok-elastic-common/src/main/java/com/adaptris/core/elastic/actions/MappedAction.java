@@ -1,6 +1,7 @@
 package com.adaptris.core.elastic.actions;
 
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.util.Args;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
@@ -9,6 +10,9 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.elastic.DocumentWrapper;
 import com.adaptris.util.KeyValuePairList;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Wraps a ActionExtractor implementation which is then mapped onto a different action.
@@ -17,15 +21,34 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 
  */
 @XStreamAlias("elastic-mapped-action")
-@ComponentProfile(summary = "Wraps a ActionExtractor implementation which is then mapped onto a different action", since = "3.9.1")
+@ComponentProfile(
+    summary = "Wraps a ActionExtractor implementation which is then mapped onto a different action",
+    since = "3.9.1")
 public class MappedAction implements ActionExtractor {
 
+  /**
+   * The underlying action extractor.
+   * 
+   */
   @NotNull
   @InputFieldDefault(value = "INDEX")
+  @Getter
+  @Setter
+  @NonNull
   private ActionExtractor action;
+  /**
+   * Mapping the action returned by the extractor into another action.
+   * <p>
+   * If the key from the list matches the action returned by the extractor, then the associated
+   * value is used. Otherwise the extracted action is used.
+   * </p>
+   */
   @NotNull
+  @Getter
+  @Setter
+  @NonNull
   private KeyValuePairList mappings;
-  
+
   public MappedAction() {
     setMappings(new KeyValuePairList());
     setAction(new ConfiguredAction());
@@ -35,28 +58,12 @@ public class MappedAction implements ActionExtractor {
   public String extract(AdaptrisMessage msg, DocumentWrapper document) throws ServiceException {
     String action = getAction().extract(msg, document);
     String mappedAction = mappings.getValue(action);
-    return mappedAction != null ? mappedAction : action;
-  }
-
-  public ActionExtractor getAction() {
-    return action;
-  }
-
-  public void setAction(ActionExtractor action) {
-    this.action = Args.notNull(action, "action");
+    return ObjectUtils.defaultIfNull(mappedAction, action);
   }
 
   public MappedAction withAction(ActionExtractor action) {
     setAction(action);
     return this;
-  }
-
-  public KeyValuePairList getMappings() {
-    return mappings;
-  }
-
-  public void setMappings(KeyValuePairList mappings) {
-    this.mappings = Args.notNull(mappings, "mappings");
   }
 
   public MappedAction withMappings(KeyValuePairList mappings) {

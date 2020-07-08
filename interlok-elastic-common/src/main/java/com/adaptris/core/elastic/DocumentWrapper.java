@@ -17,11 +17,16 @@
 package com.adaptris.core.elastic;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import lombok.NonNull;
+import lombok.Setter;
 
 public class DocumentWrapper {
 
   private final String uniqueId;
+  @Setter
   private String routing;
+  @Setter
+  @NonNull
   private DocumentAction action;
   private final XContentBuilder content;
   
@@ -41,11 +46,6 @@ public class DocumentWrapper {
   public String routing() {
     return routing;
   }
-
-  public void setRouting(String routing) {
-    this.routing = routing;
-  }
-
 
   public DocumentWrapper withRouting(String r) {
     setRouting(r);
@@ -69,10 +69,5 @@ public class DocumentWrapper {
   public DocumentAction action() {
     return action;
   }
-
-  public void setAction(DocumentAction action) {
-    this.action = action;
-  }
-  
 
 }

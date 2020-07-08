@@ -15,16 +15,13 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.sniff.Sniffer;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class TransportClient implements Closeable {
 
   private transient RestHighLevelClient restHighLevelClient;
   private transient Sniffer sniffer;
-
-  public TransportClient(RestHighLevelClient client, Sniffer sniffer) {
-    restHighLevelClient = client;
-    this.sniffer = sniffer;
-  }
 
   @Override
   @SuppressWarnings("deprecation")

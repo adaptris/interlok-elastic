@@ -2,7 +2,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
-  id 'com.github.spotbugs' version '4.0.5' apply false
+  id "io.freefair.lombok" version "5.1.0" apply false
+  id 'com.github.spotbugs' version '4.2.3' apply false
+  id 'org.owasp.dependencycheck' version '5.3.2.1' apply false
 }
 
 ext {
@@ -22,8 +24,7 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  elasticVersion = '7.6.2'
-  log4j2Version = '2.13.2'
+  elasticVersion = '7.7.1'
   junitJupiterVersion = '5.6.2'
   mockitoVersion = '3.3.3'
 }
@@ -77,11 +78,14 @@ subprojects {
   apply plugin: "jacoco"
   apply plugin: "nebula.optional-base"
   apply plugin: 'com.github.spotbugs'
+  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: "io.freefair.lombok"
 
   sourceCompatibility = 1.8
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
+  generateLombokConfig.enabled = false
 
   repositories {
     mavenCentral()
@@ -117,11 +121,11 @@ subprojects {
   dependencies {
     annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-    implementation ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
-    implementation ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-    implementation ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
+    compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
+    compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
+    compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.10.3")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.0")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
@@ -137,7 +141,7 @@ subprojects {
     }
 
     implementation ("org.yaml:snakeyaml:1.26")
-    implementation ("commons-codec:commons-codec:1.13")
+    implementation ("commons-codec:commons-codec:1.14")
     implementation ("org.apache.httpcomponents:httpclient:4.5.12")
 
     testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
@@ -154,10 +158,14 @@ subprojects {
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
     testImplementation ('junit:junit:4.13')
-    testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true}
-    testImplementation ("org.apache.logging.log4j:log4j-core:$log4j2Version")
-    testImplementation ("org.apache.logging.log4j:log4j-1.2-api:$log4j2Version")
-    testImplementation ("org.apache.logging.log4j:log4j-api:$log4j2Version")
+    testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
+    // exclude any log4j dependencies so that we can just use slf4j simple.
+    // works around INTERLOk-3233
+    testImplementation "com.adaptris:interlok-stubs:$interlokCoreVersion", {
+      changing= true
+      exclude group: "org.apache.logging.log4j"
+    }
+
 
     testImplementation ("org.mockito:mockito-core:$mockitoVersion")
     testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
@@ -242,9 +250,29 @@ subprojects {
     }
  }
 
+  dependencyCheck  {
+    suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
+    skipConfigurations = [ "antSql", "spotbugs", "umlDoclet", "offlineJavadocPackages", "javadoc", "jacocoAnt", "jacocoAgent", "spotbugsPlugins", "spotbugsSlf4j" ]
+    formats = [ "HTML", "JUNIT" ]
+    junitFailOnCVSS = 7.0
+    failBuildOnCVSS = 7.0
+    analyzers {
+      assemblyEnabled=false
+    }
+  }
+
   // disable spotbugsTests which checks our test code..
   spotbugsTest.enabled = false
 
+
+  task lgtmCompile(type: JavaCompile, dependsOn: delombok) {
+    group 'Build'
+    description 'Compile for lgtm'
+
+    source = sourceSets.main.extensions.delombokTask
+    destinationDir = sourceSets.main.java.outputDir
+    classpath = project.sourceSets.main.compileClasspath
+  }
 
   check.dependsOn jacocoTestReport
   javadoc.dependsOn offlinePackageList

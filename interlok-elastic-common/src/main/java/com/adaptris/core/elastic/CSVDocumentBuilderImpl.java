@@ -18,17 +18,14 @@ package com.adaptris.core.elastic;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -36,7 +33,6 @@ import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
@@ -50,21 +46,59 @@ import com.adaptris.core.util.Args;
 import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.util.NumberUtils;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
+
+  /**
+   * The format of the CSV file.
+   * <p>
+   * Defaults to {@link BasicFormatBuilder} by default.
+   * </p>
+   */
   @NotNull
   @AutoPopulated
   @Valid
+  @Getter
+  @Setter
+  @NonNull
   private FormatBuilder format;
+  /**
+   * Which field in your CSV is considered the unique-id.
+   * <p>
+   * If not explicitly specified, defaults to the first field (0)
+   * </p>
+   */
   @AdvancedConfig
   @Min(0)
   @InputFieldDefault(value = "0")
+  @Getter
+  @Setter
   private Integer uniqueIdField;
+  /**
+   * Do you have any specific fieldname mapping 
+   * <p>
+   * Defaults to {@link NoOpFieldNameMapper}.
+   * </p>
+   */
   @AdvancedConfig
   @NotNull
   @Valid
+  @Getter
+  @Setter
+  @NonNull
   private FieldNameMapper fieldNameMapper;
+  /**
+   * The field which you want to add the ms since epoch to.
+   * <p>
+   * If not explicitly specified, the timestamp will not be emitted
+   * </p>
+   */
   @AdvancedConfig
+  @Getter
+  @Setter
   private String addTimestampField;
 
   protected transient Logger log = LoggerFactory.getLogger(this.getClass());
@@ -74,58 +108,23 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     setFieldNameMapper(new NoOpFieldNameMapper());
   }
 
-
-  public FormatBuilder getFormat() {
-    return format;
-  }
-
-  public void setFormat(FormatBuilder csvFormat) {
-    this.format = Args.notNull(csvFormat, "format");
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends CSVDocumentBuilderImpl> T withFormat(FormatBuilder format) {
     setFormat(format);
     return (T) this;
   }
 
-  public Integer getUniqueIdField() {
-    return uniqueIdField;
-  }
-
-
-  /**
-   * Specify which field is considered the unique-id
-   * 
-   * @param i the uniqueIdField to set, defaults to the first field (first field = '0').
-   */
-  public void setUniqueIdField(Integer i) {
-    this.uniqueIdField = i;
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends CSVDocumentBuilderImpl> T withUniqueIdField(Integer i) {
     setUniqueIdField(i);
     return (T) this;
   }
 
-
-  public String getAddTimestampField() {
-    return addTimestampField;
-  }
-
-  /**
-   * Specify a value here to emit the current ms since epoch as the fields value.
-   * 
-   * @param s the fieldname (default null)
-   */
-  public void setAddTimestampField(String s) {
-    this.addTimestampField = s;
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends CSVDocumentBuilderImpl> T withAddTimestampField(String s) {
     setAddTimestampField(s);
     return (T) this;
   }
-
 
   protected void addTimestamp(XContentBuilder b) throws IOException {
     if (!isBlank(getAddTimestampField())) {
@@ -137,15 +136,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     return NumberUtils.toIntDefaultIfNull(getUniqueIdField(), 0);
   }
 
-
-  public FieldNameMapper getFieldNameMapper() {
-    return fieldNameMapper;
-  }
-
-  public void setFieldNameMapper(FieldNameMapper fieldNameMapper) {
-    this.fieldNameMapper = Args.notNull(fieldNameMapper, "fieldNameMapper");
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends CSVDocumentBuilderImpl> T withFieldNameMapper(FieldNameMapper s) {
     setFieldNameMapper(s);
     return (T) this;

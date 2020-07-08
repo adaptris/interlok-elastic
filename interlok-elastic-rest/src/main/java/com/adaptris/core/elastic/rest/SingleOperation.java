@@ -19,7 +19,6 @@ package com.adaptris.core.elastic.rest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.http.util.Args;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -41,6 +40,9 @@ import com.adaptris.core.elastic.actions.ConfiguredAction;
 import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * INDEX/UPDATE/DELETE a document(s) to ElasticSearch.
@@ -75,17 +77,44 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 })
 public class SingleOperation extends ElasticRestProducer {
 
+  /**
+   * How to build the document for elastic.
+   * <p>
+   * If not explicitly defined then defaults to {@link SimpleDocumentBuilder}
+   * </p>
+   */
   @Valid
   @NotNull
   @AutoPopulated
   @InputFieldDefault(value = "simple-document-builder")
+  @Getter
+  @Setter
+  @NonNull
   private ElasticDocumentBuilder documentBuilder;
 
+  /**
+   * The action for this operation if not explicitly defined by the {@link DocumentWrapper}
+   * <p>
+   * If not explicitly defined then defaults to {@link ConfiguredAction} with a default of {@code INDEX}.
+   * </p>
+   */
   @Valid
+  @Getter
+  @Setter
+  @NonNull
+  @NotNull
   @InputFieldDefault(value = "configured-action")
   private ActionExtractor action;
 
+  /**
+   * The refresh policy
+   * <p>
+   * This would be generally "true", "false" or "wait_until". The default is null.
+   * </p>
+   */
   @AdvancedConfig
+  @Getter
+  @Setter
   private String refreshPolicy;
 
   protected transient RequestBuilder requestBuilder = new ElasticRequestBuilder();
@@ -138,38 +167,14 @@ public class SingleOperation extends ElasticRestProducer {
     return msg;
   }
 
-  /**
-   * @return the documentBuilder
-   */
-  public ElasticDocumentBuilder getDocumentBuilder() {
-    return documentBuilder;
-  }
 
-  /**
-   * @param b the documentBuilder to set
-   */
-  public void setDocumentBuilder(ElasticDocumentBuilder b) {
-    this.documentBuilder = Args.notNull(b, "documentBuilder");
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends SingleOperation> T withDocumentBuilder(ElasticDocumentBuilder b) {
     setDocumentBuilder(b);
     return (T) this;
   }
 
-  public ActionExtractor getAction() {
-    return action;
-  }
-
-  /**
-   * Set the action to be performed in the event the {@link DocumentWrapper} does not specify it.
-   * 
-   * @param action the action, the default will be to INDEX
-   */
-  public void setAction(ActionExtractor action) {
-    this.action = action;
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends SingleOperation> T withAction(ActionExtractor b) {
     setAction(b);
     return (T) this;
@@ -180,22 +185,7 @@ public class SingleOperation extends ElasticRestProducer {
     return ObjectUtils.defaultIfNull(getAction(), new ConfiguredAction());
   }
 
-  /**
-   * @return the refreshPolicy
-   */
-  public String getRefreshPolicy() {
-    return refreshPolicy;
-  }
-
-  /**
-   * Set the refresh policy.
-   * 
-   * @param s the refreshPolicy to set, generally "true", "false" or "wait_until", default is null.
-   */
-  public void setRefreshPolicy(String s) {
-    this.refreshPolicy = s;
-  }
-
+  @SuppressWarnings("unchecked")
   public <T extends SingleOperation> T withRefreshPolicy(String b) {
     setRefreshPolicy(b);
     return (T) this;

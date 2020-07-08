@@ -17,7 +17,7 @@
 package com.adaptris.core.elastic.rest;
 
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.*;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -58,7 +58,7 @@ public class SingleOperationTest extends ProducerCase {
   public void testIndex() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     IndexResponse response = mockIndexResponse();
-    Mockito.when(client.index(anyObject())).thenReturn(response);
+    Mockito.when(client.index(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     SingleOperation p = createProducerForTests("INDEX");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -71,7 +71,7 @@ public class SingleOperationTest extends ProducerCase {
   public void testUpdate() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     UpdateResponse response = mockUpdateResponse();
-    Mockito.when(client.update(anyObject())).thenReturn(response);
+    Mockito.when(client.update(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     SingleOperation p = createProducerForTests("UPDATE");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -84,7 +84,7 @@ public class SingleOperationTest extends ProducerCase {
   public void testDelete() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     DeleteResponse response = mockDeleteResponse();
-    Mockito.when(client.delete(anyObject())).thenReturn(response);
+    Mockito.when(client.delete(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     SingleOperation p = createProducerForTests("DELETE");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
@@ -97,7 +97,7 @@ public class SingleOperationTest extends ProducerCase {
   public void testUpsert() throws Exception {
     TransportClient client = Mockito.mock(TransportClient.class);
     UpdateResponse response = mockUpdateResponse();
-    Mockito.when(client.update(anyObject())).thenReturn(response);
+    Mockito.when(client.update(any())).thenReturn(response);
     ElasticRestConnection conn = new PreConfiguredConnection(client);
     SingleOperation p = createProducerForTests("UPSERT");
     StandaloneProducer prod = new StandaloneProducer(conn, p);

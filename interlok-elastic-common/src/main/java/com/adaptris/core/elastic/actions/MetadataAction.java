@@ -6,7 +6,11 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.elastic.DocumentWrapper;
+import com.adaptris.util.KeyValuePairList;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Derive a document action from metadata.
@@ -17,21 +21,22 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @ComponentProfile(summary = "Derive a document action from metadata", since = "3.9.1")
 public class MetadataAction implements ActionExtractor {
 
+  /**
+   * The metadata key that provides the action.
+   * <p>
+   * If not specified the default metadata key is {@code action}
+   * </p>
+   */
   @NotNull
   @InputFieldDefault(value = "action")
+  @Getter
+  @Setter
+  @NonNull
   private String metadataKey;
 
   @Override
   public String extract(AdaptrisMessage msg, DocumentWrapper document) {
     return msg.getMetadataValue(metadataKey());
-  }
-
-  public String getMetadataKey() {
-    return metadataKey;
-  }
-
-  public void setMetadataKey(String metadataKey) {
-    this.metadataKey = metadataKey;
   }
   
   private String metadataKey() {

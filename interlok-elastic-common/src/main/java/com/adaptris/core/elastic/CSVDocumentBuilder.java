@@ -17,16 +17,13 @@
 package com.adaptris.core.elastic;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.BooleanUtils;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
@@ -34,6 +31,8 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
 import com.adaptris.core.transform.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Builds a simple document for elastic search.
@@ -55,8 +54,15 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @ComponentProfile(summary = "Build documents for elasticsearch from a CSV document", since = "3.9.1")
 public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
 
+  /**
+   * Whether or not the document contains a header row.
+   * 
+   * <p>This defaults to true unless otherwise specified</p>
+   */
   @AdvancedConfig
   @InputFieldDefault(value = "true")
+  @Getter
+  @Setter
   private Boolean useHeaderRecord;
 
   public CSVDocumentBuilder() {
@@ -66,19 +72,6 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   public CSVDocumentBuilder(FormatBuilder f) {
     super();
     setFormat(f);
-  }
-
-  public Boolean getUseHeaderRecord() {
-    return useHeaderRecord;
-  }
-
-  /**
-   * Whether or not the document contains a header row.
-   * 
-   * @param b the useHeaderRecord to set, defaults to true.
-   */
-  public void setUseHeaderRecord(Boolean b) {
-    this.useHeaderRecord = b;
   }
 
   public CSVDocumentBuilder withUseHeaderRecord(Boolean b) {
