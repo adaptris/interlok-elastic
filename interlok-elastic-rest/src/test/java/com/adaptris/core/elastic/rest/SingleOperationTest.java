@@ -17,7 +17,7 @@
 package com.adaptris.core.elastic.rest;
 
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.ProducerCase;
 import com.adaptris.core.ServiceCase;
 import com.adaptris.core.ServiceException;
@@ -45,7 +44,7 @@ public class SingleOperationTest extends ProducerCase {
     ElasticRestConnection esc = new ElasticRestConnection("http://localhost:9200");
     SingleOperation producer = new SingleOperation().withAction(new ConfiguredAction())
         .withDocumentBuilder(new SimpleDocumentBuilder()).withRefreshPolicy(null)
-        .withDestination(new ConfiguredProduceDestination("myIndex"));
+        .withIndex(("myIndex"));
     return new StandaloneProducer(esc, producer);
   }
 
@@ -117,7 +116,7 @@ public class SingleOperationTest extends ProducerCase {
       ServiceCase.execute(prod, msg);
       fail();
     } catch (ServiceException expected) {
-      
+
     }
   }
 
@@ -145,7 +144,7 @@ public class SingleOperationTest extends ProducerCase {
   private SingleOperation createProducerForTests(String action) {
     SingleOperation producer = new SingleOperation().withAction(new ConfiguredAction().withAction(action))
         .withDocumentBuilder(new SimpleDocumentBuilder()).withRefreshPolicy(null)
-        .withDestination(new ConfiguredProduceDestination("myIndex"));
+            .withIndex(("myIndex"));
     return producer;
   }
 }

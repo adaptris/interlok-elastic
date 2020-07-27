@@ -19,14 +19,13 @@ package com.adaptris.core.elastic.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.common.unit.TimeValue;
 import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.ProducerCase;
 import com.adaptris.core.ServiceCase;
 import com.adaptris.core.ServiceException;
@@ -149,7 +148,7 @@ public class BulkOperationTest extends ProducerCase {
     ElasticRestConnection esc = new ElasticRestConnection("http://localhost:9200");
     BulkOperation producer = new BulkOperation().withBatchWindow(1000).withRefreshPolicy(null).withAction(new ConfiguredAction())
         .withDocumentBuilder(new SimpleDocumentBuilder())
-        .withDestination(new ConfiguredProduceDestination("myIndex"));
+        .withIndex("myIndex");
     return new StandaloneProducer(esc, producer);
   }
 
@@ -172,7 +171,7 @@ public class BulkOperationTest extends ProducerCase {
     BulkOperation producer = new BulkOperation().withAction(new ConfiguredAction().withAction(action))
         .withDocumentBuilder(new CSVDocumentBuilder().withUseHeaderRecord(true))
         .withRefreshPolicy(null)
-        .withDestination(new ConfiguredProduceDestination("myIndex"));
+            .withIndex("myIndex");
     return producer;
   }
 

@@ -31,8 +31,8 @@ import com.adaptris.core.ProduceException;
 import com.adaptris.core.elastic.DocumentAction;
 import com.adaptris.core.elastic.DocumentWrapper;
 import com.adaptris.core.elastic.actions.ActionExtractor;
-import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.util.NumberUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
@@ -41,7 +41,7 @@ import lombok.Setter;
 
 /**
  * Index/Delete/Update a document(s) to ElasticSearch.
- * 
+ *
  * <p>
  * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the index that the documents will be inserted against
  * ElasticSearch; the {@code type} is taken from the DocumentBuilder
@@ -53,7 +53,7 @@ import lombok.Setter;
  * that the document generated contains all the data required, not just a subset. If in doubt; stick to a normal
  * {@link DocumentAction#UPDATE} which will throw a {@code DocumentMissingException} failing the messages.
  * </p>
- * 
+ *
  * @config elastic-rest-bulk-operation
  *
  */
@@ -63,7 +63,7 @@ import lombok.Setter;
     recommended = {ElasticRestConnection.class})
 @DisplayOrder(order =
 {
-    "batchWindow", "documentBuilder", "action", "refreshPolicy"
+    "index", "batchWindow", "documentBuilder", "action", "refreshPolicy"
 })
 @NoArgsConstructor
 public class BulkOperation extends SingleOperation {
@@ -83,10 +83,10 @@ public class BulkOperation extends SingleOperation {
   private Integer batchWindow;
 
   @Override
-  protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
+  protected AdaptrisMessage doRequest(AdaptrisMessage msg, final String index, long timeout)
+      throws ProduceException {
     try {
       TransportClient client = retrieveConnection(TransportClientProvider.class).getTransport();
-      final String index = destination.getDestination(msg);
       BulkRequest bulkRequest = requestBuilder.buildBulkRequest().setRefreshPolicy(getRefreshPolicy());
       long total = 0;
       try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(getDocumentBuilder().build(msg))) {

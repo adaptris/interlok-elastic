@@ -10,10 +10,10 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.DefaultMessageFactory;
 import com.adaptris.core.elastic.DocumentWrapper;
 import com.adaptris.core.elastic.SimpleDocumentBuilder;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 
 public class ElasticRequestBuilderTest {
-  
+
   private DocumentWrapper createWrapper() throws Exception {
     DocumentWrapper result = null;
     AdaptrisMessage adaptrisMessage = DefaultMessageFactory.getDefaultInstance().newMessage("Some Content");
@@ -24,18 +24,18 @@ public class ElasticRequestBuilderTest {
     }
     return result;
   }
-  
+
   @Test
-  public void testBuildIndexRequest() throws Exception {    
+  public void testBuildIndexRequest() throws Exception {
     ElasticRequestBuilder builder = new ElasticRequestBuilder();
     DocumentWrapper documentWrapper = createWrapper();
     IndexRequest request = builder.buildIndexRequest("myIndex", documentWrapper, null);
     assertEquals(documentWrapper.uniqueId(), request.id());
     assertEquals("myIndex", request.index());
   }
-  
+
   @Test
-  public void testBuildUpdateRequest() throws Exception {    
+  public void testBuildUpdateRequest() throws Exception {
     ElasticRequestBuilder builder = new ElasticRequestBuilder();
     DocumentWrapper documentWrapper = createWrapper();
     UpdateRequest request = builder.buildUpdateRequest("myIndex", documentWrapper, null);
