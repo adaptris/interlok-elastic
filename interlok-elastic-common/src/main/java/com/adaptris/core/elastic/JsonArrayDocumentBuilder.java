@@ -210,7 +210,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
             String jsonString = node.toString();
             XContentBuilder jsonContent = jsonBuilder(jsonString);
             ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
-            result = new DocumentWrapper(get(ctx, uidPath()), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
+            result = new DocumentWrapper(get(ctx, msg.resolve(uidPath())), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
           }
         }
       } catch (Exception e) {

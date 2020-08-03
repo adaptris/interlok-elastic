@@ -55,6 +55,25 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     assertEquals(4, count);
   }
 
+  @Test
+  public void testBuild_ArrayStyle_with_resolvable_uniqueid() throws Exception {
+    AdaptrisMessage msg = createMessage();
+    msg.addMetadata("id","uniqueid");
+    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder()
+            .withUniqueIdJsonPath("$.%message{id}");
+
+    int count = 0;
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
+      for (DocumentWrapper d : docs) {
+        count++;
+        assertNotNull(d.uniqueId());
+        assertNull(d.routing());
+        assertEquals("000" + count, d.uniqueId());
+        assertNotNull(d.content());
+      }
+    }
+    assertEquals(4, count);
+  }
 
   @Test
   public void testBuild_JsonLines() throws Exception {
