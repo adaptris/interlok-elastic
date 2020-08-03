@@ -24,15 +24,11 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
+import com.adaptris.annotation.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import com.adaptris.annotation.AdvancedConfig;
-import com.adaptris.annotation.ComponentProfile;
-import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.annotation.InputFieldDefault;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
@@ -90,6 +86,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    */
   @AdvancedConfig
   @InputFieldDefault(value = UID_PATH)
+  @InputFieldHint(expression = true)
   @Getter
   @Setter
   private String uniqueIdJsonPath;
