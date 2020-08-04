@@ -121,7 +121,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
           bufferSizeWarningLogged = true;
         }, "BufferSize is deprecated, and will be ignored");
       }
-      return new JsonDocumentWrapper(jsonStyle(), msg);
+      return new JsonDocumentWrapper(jsonStyle(), msg, msg.resolve(uidPath()));
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
@@ -182,11 +182,13 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     private boolean iteratorInvoked = false;
     private final CloseableIterable<AdaptrisMessage> jsonIterable;
     private final Iterator<AdaptrisMessage> jsonIterator;
+    private final String uniqueIdpath;
 
 
-    public JsonDocumentWrapper(JsonStyle style, AdaptrisMessage msg) throws Exception {
+    public JsonDocumentWrapper(JsonStyle style, AdaptrisMessage msg, String uniqueIdJsonPath) throws Exception {
       mapper = new ObjectMapper();
       jsonIterable = style.createIterator(msg);
+      uniqueIdpath = uniqueIdJsonPath;
       jsonIterator = jsonIterable.iterator();
     }
 
@@ -207,7 +209,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
             String jsonString = node.toString();
             XContentBuilder jsonContent = jsonBuilder(jsonString);
             ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
-            result = new DocumentWrapper(get(ctx, msg.resolve(uidPath())), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
+            result = new DocumentWrapper(get(ctx, uniqueIdpath), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
           }
         }
       } catch (Exception e) {
