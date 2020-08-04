@@ -24,15 +24,11 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
+import com.adaptris.annotation.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import com.adaptris.annotation.AdvancedConfig;
-import com.adaptris.annotation.ComponentProfile;
-import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.annotation.InputFieldDefault;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
@@ -90,6 +86,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    */
   @AdvancedConfig
   @InputFieldDefault(value = UID_PATH)
+  @InputFieldHint(expression = true)
   @Getter
   @Setter
   private String uniqueIdJsonPath;
@@ -124,7 +121,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
           bufferSizeWarningLogged = true;
         }, "BufferSize is deprecated, and will be ignored");
       }
-      return new JsonDocumentWrapper(jsonStyle(), msg);
+      return new JsonDocumentWrapper(jsonStyle(), msg, msg.resolve(uidPath()));
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
@@ -185,11 +182,13 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     private boolean iteratorInvoked = false;
     private final CloseableIterable<AdaptrisMessage> jsonIterable;
     private final Iterator<AdaptrisMessage> jsonIterator;
+    private final String uniqueIdPath;
 
 
-    public JsonDocumentWrapper(JsonStyle style, AdaptrisMessage msg) throws Exception {
+    public JsonDocumentWrapper(JsonStyle style, AdaptrisMessage msg, String uniqueIdJsonPath) throws Exception {
       mapper = new ObjectMapper();
       jsonIterable = style.createIterator(msg);
+      uniqueIdPath = uniqueIdJsonPath;
       jsonIterator = jsonIterable.iterator();
     }
 
@@ -210,7 +209,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
             String jsonString = node.toString();
             XContentBuilder jsonContent = jsonBuilder(jsonString);
             ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
-            result = new DocumentWrapper(get(ctx, uidPath()), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
+            result = new DocumentWrapper(get(ctx, uniqueIdPath), jsonContent).withRouting(getQuietly(ctx, getRoutingJsonPath()));
           }
         }
       } catch (Exception e) {
