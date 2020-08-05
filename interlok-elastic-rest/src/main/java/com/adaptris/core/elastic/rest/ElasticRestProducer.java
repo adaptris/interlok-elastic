@@ -1,5 +1,7 @@
 package com.adaptris.core.elastic.rest;
 
+import static com.adaptris.core.util.DestinationHelper.logWarningIfNotNull;
+import static com.adaptris.core.util.DestinationHelper.mustHaveEither;
 import java.util.concurrent.TimeUnit;
 import javax.validation.Valid;
 import com.adaptris.annotation.InputFieldHint;
@@ -10,6 +12,7 @@ import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.RequestReplyProducerImp;
 import com.adaptris.core.util.DestinationHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.util.TimeInterval;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,7 +52,11 @@ public abstract class ElasticRestProducer extends RequestReplyProducerImp {
 
 
   @Override
-  public void prepare() throws CoreException {}
+  public void prepare() throws CoreException {
+    logWarningIfNotNull(destWarning, () -> destWarning = true, getDestination(),
+        "{} uses destination, use 'index' instead", LoggingHelper.friendlyName(this));
+    mustHaveEither(getIndex(), getDestination());
+  }
 
   @Override
   protected long defaultTimeout() {
