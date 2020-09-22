@@ -37,8 +37,8 @@ import com.adaptris.core.elastic.ElasticDocumentBuilder;
 import com.adaptris.core.elastic.SimpleDocumentBuilder;
 import com.adaptris.core.elastic.actions.ActionExtractor;
 import com.adaptris.core.elastic.actions.ConfiguredAction;
-import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.NonNull;
@@ -46,7 +46,7 @@ import lombok.Setter;
 
 /**
  * INDEX/UPDATE/DELETE a document(s) to ElasticSearch.
- * 
+ *
  * <p>
  * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the index of document that we are submitting to into
  * ElasticSearch; the {@code type} will be derived from the DocumentWrapper itself.
@@ -63,8 +63,8 @@ import lombok.Setter;
  * that the document generated contains all the data required, not just a subset. If in doubt; stick to a normal
  * {@link DocumentAction#UPDATE} which will correctly throw a {@code DocumentMissingException}.
  * </p>
- * 
- * 
+ *
+ *
  * @config elastic-rest-single-operation
  *
  */
@@ -73,7 +73,7 @@ import lombok.Setter;
     since = "3.9.1", recommended = {ElasticRestConnection.class})
 @DisplayOrder(order =
 {
-    "documentBuilder", "action", "refreshPolicy"
+    "index", "documentBuilder", "action", "refreshPolicy"
 })
 public class SingleOperation extends ElasticRestProducer {
 
@@ -124,11 +124,11 @@ public class SingleOperation extends ElasticRestProducer {
   }
 
   @Override
-  protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
+  protected AdaptrisMessage doRequest(AdaptrisMessage msg, final String index, long timeout)
+      throws ProduceException {
     try {
       TransportClient client = retrieveConnection(TransportClientProvider.class).getTransport();
-      
-      final String index = destination.getDestination(msg);
+
       try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
         for (DocumentWrapper doc : docs) {
           DocumentAction action =
@@ -190,4 +190,5 @@ public class SingleOperation extends ElasticRestProducer {
     setRefreshPolicy(b);
     return (T) this;
   }
+
 }
