@@ -2,9 +2,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
-  id "io.freefair.lombok" version "5.1.1" apply false
+  id "io.freefair.lombok" version "5.2.1" apply false
   id 'com.github.spotbugs' version '4.5.0' apply false
-  id 'org.owasp.dependencycheck' version '5.3.2.1' apply false
+  id 'org.owasp.dependencycheck' version '6.0.1' apply false
 }
 
 ext {
@@ -26,7 +26,7 @@ ext {
   slf4jVersion = '1.7.30'
   elasticVersion = '7.8.1'
   junitJupiterVersion = '5.6.2'
-  mockitoVersion = '3.5.9'
+  mockitoVersion = '3.5.11'
 }
 
 
