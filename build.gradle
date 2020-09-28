@@ -4,7 +4,7 @@ plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
   id "io.freefair.lombok" version "5.2.1" apply false
   id 'com.github.spotbugs' version '4.5.0' apply false
-  id 'org.owasp.dependencycheck' version '6.0.1' apply false
+  id 'org.owasp.dependencycheck' version '6.0.2' apply false
 }
 
 ext {
@@ -26,7 +26,7 @@ ext {
   slf4jVersion = '1.7.30'
   elasticVersion = '7.9.1'
   junitJupiterVersion = '5.7.0'
-  mockitoVersion = '3.5.11'
+  mockitoVersion = '3.5.13'
 }
 
 
