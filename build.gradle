@@ -125,7 +125,7 @@ subprojects {
     compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.2")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.3")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
