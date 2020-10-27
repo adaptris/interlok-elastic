@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
 import com.adaptris.annotation.*;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +74,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    */
   @AdvancedConfig(rare = true)
   @Deprecated
-  @Removal(version = "3.10.0")
+  @ConfigDeprecated(removalVersion = "3.12.0", groups = Deprecated.class)
   @Getter
   @Setter
   private Integer bufferSize;
@@ -152,7 +153,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
    */
   @Deprecated
-  @Removal(version = "3.10.0")
+  @Removal(version = "3.12.0")
   public JsonArrayDocumentBuilder withBufferSize(Integer i) {
     setBufferSize(i);
     return this;
