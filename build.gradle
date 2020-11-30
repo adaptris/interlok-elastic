@@ -2,9 +2,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
-  id "io.freefair.lombok" version "5.1.1" apply false
-  id 'com.github.spotbugs' version '4.5.0' apply false
-  id 'org.owasp.dependencycheck' version '5.3.2.1' apply false
+  id "io.freefair.lombok" version "5.3.0" apply false
+  id 'com.github.spotbugs' version '4.5.1' apply false
+  id 'org.owasp.dependencycheck' version '6.0.3' apply false
 }
 
 ext {
@@ -24,9 +24,9 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  elasticVersion = '7.8.1'
-  junitJupiterVersion = '5.6.2'
-  mockitoVersion = '3.5.9'
+  elasticVersion = '7.9.3'
+  junitJupiterVersion = '5.7.0'
+  mockitoVersion = '3.6.0'
 }
 
 
@@ -125,12 +125,12 @@ subprojects {
     compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.2")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.3")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.6")
+    implementation ("joda-time:joda-time:2.10.8")
 
     implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
       exclude group: "org.yaml", module: "snakeyaml"
@@ -140,9 +140,9 @@ subprojects {
       exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
 
-    implementation ("org.yaml:snakeyaml:1.26")
-    implementation ("commons-codec:commons-codec:1.14")
-    implementation ("org.apache.httpcomponents:httpclient:4.5.12")
+    implementation ("org.yaml:snakeyaml:1.27")
+    implementation ("commons-codec:commons-codec:1.15")
+    implementation ("org.apache.httpcomponents:httpclient:4.5.13")
 
     testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
@@ -150,14 +150,14 @@ subprojects {
       because 'allows JUnit 3 and JUnit 4 tests to run'
     }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.6.2") {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.0") {
       because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
-    testImplementation ('junit:junit:4.13')
+    testImplementation ('junit:junit:4.13.1')
     testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
     // exclude any log4j dependencies so that we can just use slf4j simple.
     // works around INTERLOk-3233

@@ -24,17 +24,23 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Iterator;
-import com.adaptris.annotation.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
+import com.adaptris.annotation.InputFieldDefault;
+import com.adaptris.annotation.InputFieldHint;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
-import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.interlok.util.CloseableIterable;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
@@ -50,12 +56,12 @@ import lombok.Setter;
 
 /**
  * Parse a json array (or json lines format)and create documents from it for elasticsearch
- * 
+ *
  * <p>
  * The unique-id for each document created is derived from the {@link JsonArrayDocumentBuilder#getUniqueIdJsonPath()} which defaults
  * to {@code $.uniqueid}
  * </p>
- * 
+ *
  * @config elastic-json-array-document-builder
  *
  */
@@ -73,13 +79,13 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    */
   @AdvancedConfig(rare = true)
   @Deprecated
-  @Removal(version = "3.10.0")
+  @ConfigDeprecated(removalVersion = "3.12.0", groups = Deprecated.class)
   @Getter
   @Setter
   private Integer bufferSize;
   /**
    * The json path to the unique id.
-   * 
+   *
    * <p>
    * If not specified explicitly then defaults to {@code $.uniqueid}
    * </p>
@@ -92,20 +98,20 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
   private String uniqueIdJsonPath;
   /**
    * Set the JSON path to extract the routing information.
-   * 
-   * 
-   */  
+   *
+   *
+   */
   @AdvancedConfig
   @Getter
   @Setter
   private String routingJsonPath;
   /**
    * Specify how the payload is parsed to provide JSON objects.
-   * 
+   *
    * <p>
    * If not specified defaults to {@code JSON_ARRAY}
    * </p>
-   */ 
+   */
   @InputFieldDefault(value = "JSON_ARRAY")
   @Getter
   @Setter
@@ -148,11 +154,11 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
 
   /**
-   * 
+   *
    * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
    */
   @Deprecated
-  @Removal(version = "3.10.0")
+  @Removal(version = "3.12.0")
   public JsonArrayDocumentBuilder withBufferSize(Integer i) {
     setBufferSize(i);
     return this;
@@ -187,7 +193,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
     public JsonDocumentWrapper(JsonStyle style, AdaptrisMessage msg, String uniqueIdJsonPath) throws Exception {
       mapper = new ObjectMapper();
-      jsonIterable = style.createIterator(msg);
+      jsonIterable = CloseableIterable.ensureCloseable(style.createIterator(msg));
       uniqueIdPath = uniqueIdJsonPath;
       jsonIterator = jsonIterable.iterator();
     }
