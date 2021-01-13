@@ -79,7 +79,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    */
   @AdvancedConfig(rare = true)
   @Deprecated
-  @ConfigDeprecated(removalVersion = "3.12.0", groups = Deprecated.class)
+  @ConfigDeprecated(removalVersion = "4.0.0", groups = Deprecated.class)
   @Getter
   @Setter
   private Integer bufferSize;
@@ -158,7 +158,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
    * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
    */
   @Deprecated
-  @Removal(version = "3.12.0")
+  @Removal(version = "4.0.0")
   public JsonArrayDocumentBuilder withBufferSize(Integer i) {
     setBufferSize(i);
     return this;
