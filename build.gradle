@@ -3,13 +3,13 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
   id 'nebula.optional-base' version '5.0.3'  apply false
   id "io.freefair.lombok" version "5.3.0" apply false
-  id 'com.github.spotbugs' version '4.5.1' apply false
-  id 'org.owasp.dependencycheck' version '6.0.3' apply false
+  id 'com.github.spotbugs' version '4.6.0' apply false
+  id 'org.owasp.dependencycheck' version '6.0.5' apply false
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.11-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.11-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.12-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.12-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -26,7 +26,7 @@ ext {
   slf4jVersion = '1.7.30'
   elasticVersion = '7.9.3'
   junitJupiterVersion = '5.7.0'
-  mockitoVersion = '3.6.0'
+  mockitoVersion = '3.7.0'
 }
 
 
@@ -81,7 +81,8 @@ subprojects {
   apply plugin: 'org.owasp.dependencycheck'
   apply plugin: "io.freefair.lombok"
 
-  sourceCompatibility = 1.8
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
@@ -125,12 +126,12 @@ subprojects {
     compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.11.3")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.1")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.8")
+    implementation ("joda-time:joda-time:2.10.9")
 
     implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
       exclude group: "org.yaml", module: "snakeyaml"
