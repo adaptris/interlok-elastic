@@ -1,18 +1,14 @@
 package com.adaptris.core.elastic.rest;
 
-import static com.adaptris.core.util.DestinationHelper.logWarningIfNotNull;
-import static com.adaptris.core.util.DestinationHelper.mustHaveEither;
 import java.util.concurrent.TimeUnit;
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.RequestReplyProducerImp;
 import com.adaptris.core.util.DestinationHelper;
-import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.interlok.util.Args;
 import com.adaptris.util.TimeInterval;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,24 +24,13 @@ public abstract class ElasticRestProducer extends RequestReplyProducerImp {
   private static final TimeInterval TIMEOUT = new TimeInterval(2L, TimeUnit.MINUTES);
 
   /**
-   * The destination is the index.
-   *
-   */
-  @Getter
-  @Setter
-  @Deprecated
-  @Valid
-  @ConfigDeprecated(removalVersion = "4.0.0", message = "Use 'index' instead", groups = Deprecated.class)
-  private ProduceDestination destination;
-
-  /**
    * The elastic index to target
    *
    */
   @InputFieldHint(expression = true)
   @Getter
   @Setter
-  // Needs to be @NotBlank when destination is removed.
+  @NotBlank
   private String index;
 
   private transient boolean destWarning;
@@ -53,9 +38,7 @@ public abstract class ElasticRestProducer extends RequestReplyProducerImp {
 
   @Override
   public void prepare() throws CoreException {
-    logWarningIfNotNull(destWarning, () -> destWarning = true, getDestination(),
-        "{} uses destination, use 'index' instead", LoggingHelper.friendlyName(this));
-    mustHaveEither(getIndex(), getDestination());
+    Args.notBlank(getIndex(), "index");
   }
 
   @Override
@@ -76,7 +59,7 @@ public abstract class ElasticRestProducer extends RequestReplyProducerImp {
 
   @Override
   public String endpoint(AdaptrisMessage msg) throws ProduceException {
-    return DestinationHelper.resolveProduceDestination(getIndex(), getDestination(), msg);
+    return DestinationHelper.resolveProduceDestination(getIndex(), msg);
   }
 
 }
