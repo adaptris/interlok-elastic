@@ -4,17 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.util.Date;
 import java.util.LinkedHashMap;
-
 import org.elasticsearch.common.Strings;
 import org.junit.Test;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.elastic.fields.ToUpperCaseFieldNameMapper;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 
@@ -29,7 +26,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
           + System.lineSeparator()
           + "UID-2,26N35S,Rape Winter,Fungicides,12,20150314,,200,Kilograms per Hectare,,0,52.71896363632868,-1.2391368098336788,233,217"
           + System.lineSeparator();
-  
+
   public static final String CSV_WITH_LATLON_AND_DELTA =
       "productuniqueid,productname,crop,productcategory,applicationweek,operationdate,manufacturer,applicationrate,measureunit,growthstagecode,iscanonical,latitude,longitude,recordid,id,delta_status"
           + System.lineSeparator()
@@ -59,7 +56,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     return new CSVWithGeoPointBuilder().withLatitudeFieldNames("latitude,lat").withLongitudeFieldNames("longitude,lon")
         .withLocationFieldName("location");
   }
-  
+
   @Test
   public void testBuild_WithTimestamp() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON);
@@ -79,7 +76,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
       }
     }
     assertEquals(2, count);
-  }  
+  }
 
   @Test
   public void testBuild_WithLatLong() throws Exception {
@@ -100,7 +97,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     }
     assertEquals(2, count);
   }
-  
+
   @Test
   public void testBuild_WithLatLongAndMapper() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON);
@@ -121,7 +118,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     }
     assertEquals(2, count);
   }
-  
+
   @Test
   public void testBuild_WithCustomLatLong() throws Exception {
     String payload = CSV_WITH_LATLON.replace("latitude", "my_lat").replace("longitude", "my_lon");
@@ -145,7 +142,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     }
     assertEquals(2, count);
   }
-  
+
   @Test
   public void testBuild_WithLatLongAndDelta() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON_AND_DELTA);

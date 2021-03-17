@@ -3,19 +3,16 @@ package com.adaptris.core.elastic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
-
 import org.elasticsearch.common.Strings;
 import org.junit.Test;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.stubs.DefectiveMessageFactory;
 import com.adaptris.core.stubs.DefectiveMessageFactory.WhenToBreak;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.jayway.jsonpath.ReadContext;
 
 public class SimpleJsonDocumentBuilderTest extends BuilderCase {
