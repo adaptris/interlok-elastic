@@ -93,28 +93,6 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  public void testBufferSize() throws Exception {
-    AdaptrisMessage msg = createMessage();
-    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder();
-    assertNull(builder.getBufferSize());
-    builder.withBufferSize(1024);
-    assertEquals(Integer.valueOf(1024), builder.getBufferSize());
-    int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
-      for (DocumentWrapper d : docs) {
-        count++;
-        assertNotNull(d.uniqueId());
-        assertNull(d.routing());
-        assertEquals("000" + count, d.uniqueId());
-        assertNotNull(d.content());
-      }
-    }
-    assertEquals(4, count);
-  }
-
-
-  @Test
   public void testBuild() throws Exception {
     AdaptrisMessage msg = createMessage();
     JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder();

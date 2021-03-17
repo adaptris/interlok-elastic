@@ -33,14 +33,11 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
 import com.adaptris.core.util.ExceptionHelper;
-import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.interlok.util.CloseableIterable;
-import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jayway.jsonpath.Configuration;
@@ -73,16 +70,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
   public static final String UID_PATH = "$.uniqueid";
 
-  /**
-   * Internal buffer size.
-   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly and will be ignored.
-   */
-  @AdvancedConfig(rare = true)
-  @Deprecated
-  @ConfigDeprecated(removalVersion = "4.0.0", groups = Deprecated.class)
-  @Getter
-  @Setter
-  private Integer bufferSize;
   /**
    * The json path to the unique id.
    *
@@ -117,16 +104,9 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
   @Setter
   private JsonStyle jsonStyle;
 
-  private transient boolean bufferSizeWarningLogged = false;
-
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
     try {
-      if (getBufferSize() != null) {
-        LoggingHelper.logWarning(bufferSizeWarningLogged, () -> {
-          bufferSizeWarningLogged = true;
-        }, "BufferSize is deprecated, and will be ignored");
-      }
       return new JsonDocumentWrapper(jsonStyle(), msg, msg.resolve(uidPath()));
     }
     catch (Exception e) {
@@ -150,18 +130,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
   protected JsonStyle jsonStyle() {
     return ObjectUtils.defaultIfNull(getJsonStyle(), JsonStyle.JSON_ARRAY);
-  }
-
-
-  /**
-   *
-   * @deprecated since 3.9.3 to support JSON lines, we no longer parse the JSON directly.
-   */
-  @Deprecated
-  @Removal(version = "4.0.0")
-  public JsonArrayDocumentBuilder withBufferSize(Integer i) {
-    setBufferSize(i);
-    return this;
   }
 
   public JsonArrayDocumentBuilder withUniqueIdJsonPath(String s) {
