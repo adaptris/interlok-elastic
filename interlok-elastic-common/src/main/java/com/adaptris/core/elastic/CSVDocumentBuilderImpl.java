@@ -38,13 +38,12 @@ import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
+import com.adaptris.core.elastic.csv.BasicFormatBuilder;
+import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.adaptris.core.elastic.fields.FieldNameMapper;
 import com.adaptris.core.elastic.fields.NoOpFieldNameMapper;
-import com.adaptris.core.transform.csv.BasicFormatBuilder;
-import com.adaptris.core.transform.csv.FormatBuilder;
-import com.adaptris.core.util.Args;
-import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.util.NumberUtils;
 import lombok.Getter;
 import lombok.NonNull;
@@ -78,7 +77,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   @Setter
   private Integer uniqueIdField;
   /**
-   * Do you have any specific fieldname mapping 
+   * Do you have any specific fieldname mapping
    * <p>
    * Defaults to {@link NoOpFieldNameMapper}.
    * </p>

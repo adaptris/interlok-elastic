@@ -1,15 +1,13 @@
 package com.adaptris.core.elastic;
 
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
+import com.adaptris.core.elastic.csv.BasicFormatBuilder;
+import com.adaptris.core.elastic.csv.BasicFormatBuilder.Style;
 import com.adaptris.core.elastic.fields.NoOpFieldNameMapper;
-import com.adaptris.core.transform.csv.BasicFormatBuilder;
-import com.adaptris.core.transform.csv.BasicFormatBuilder.Style;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 
 public class CsvDocumentBuilderTest extends CsvBuilderCase {
 
