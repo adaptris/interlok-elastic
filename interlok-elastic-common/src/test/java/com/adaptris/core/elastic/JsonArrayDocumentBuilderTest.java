@@ -28,7 +28,7 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.services.splitter.json.JsonProvider.JsonStyle;
-import com.adaptris.core.util.CloseableIterable;
+import com.adaptris.interlok.util.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 
@@ -91,28 +91,6 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     }
     assertEquals(4, count);
   }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testBufferSize() throws Exception {
-    AdaptrisMessage msg = createMessage();
-    JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder();
-    assertNull(builder.getBufferSize());
-    builder.withBufferSize(1024);
-    assertEquals(Integer.valueOf(1024), builder.getBufferSize());
-    int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
-      for (DocumentWrapper d : docs) {
-        count++;
-        assertNotNull(d.uniqueId());
-        assertNull(d.routing());
-        assertEquals("000" + count, d.uniqueId());
-        assertNotNull(d.content());
-      }
-    }
-    assertEquals(4, count);
-  }
-
 
   @Test
   public void testBuild() throws Exception {

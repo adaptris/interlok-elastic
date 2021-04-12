@@ -25,20 +25,17 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ProducerCase;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.elastic.SimpleDocumentBuilder;
 import com.adaptris.core.elastic.actions.ConfiguredAction;
+import com.adaptris.interlok.junit.scaffolding.ExampleProducerCase;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 
-public class SingleOperationTest extends ProducerCase {
+public class SingleOperationTest extends ExampleProducerCase {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--" + "\n-->\n";
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+
   @Override
   protected Object retrieveObjectForSampleConfig() {
     ElasticRestConnection esc = new ElasticRestConnection("http://localhost:9200");
@@ -62,7 +59,7 @@ public class SingleOperationTest extends ProducerCase {
     SingleOperation p = createProducerForTests("INDEX");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
 
@@ -75,7 +72,7 @@ public class SingleOperationTest extends ProducerCase {
     SingleOperation p = createProducerForTests("UPDATE");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
 
@@ -88,7 +85,7 @@ public class SingleOperationTest extends ProducerCase {
     SingleOperation p = createProducerForTests("DELETE");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
 
@@ -101,7 +98,7 @@ public class SingleOperationTest extends ProducerCase {
     SingleOperation p = createProducerForTests("UPSERT");
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
 
@@ -113,7 +110,7 @@ public class SingleOperationTest extends ProducerCase {
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("hello world");
     try {
-      ServiceCase.execute(prod, msg);
+      ExampleServiceCase.execute(prod, msg);
       fail();
     } catch (ServiceException expected) {
 

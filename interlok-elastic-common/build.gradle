@@ -1,11 +1,15 @@
 ext {
-  componentName='Interlok Elastic/Common'
+  componentName='Interlok Storage/Elastic: Common'
+  componentDesc="Elasticsearch components that are not transport specific"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
 }
 
 dependencies {
   compile ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
   compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
+  // INTERLOK-3559 since we removed apache-csv out of interlok-csv it's
+  // a bigger deal to remove it out of elastic
+  compile("org.apache.commons:commons-csv:1.8")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -43,7 +47,7 @@ publishing {
           artifact sourcesJar { classifier "sources" }
           pom.withXml {
             asNode().appendNode("name", componentName)
-            asNode().appendNode("description", "Elasticsearch components that are not transport specific")
+            asNode().appendNode("description", componentDesc)
             def properties = asNode().appendNode("properties")
             properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
             properties.appendNode("target", "3.9.1+")

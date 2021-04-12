@@ -26,7 +26,6 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.elastic.DocumentAction;
 import com.adaptris.core.elastic.DocumentWrapper;
@@ -43,15 +42,17 @@ import lombok.Setter;
  * Index/Delete/Update a document(s) to ElasticSearch.
  *
  * <p>
- * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the index that the documents will be inserted against
+ * {@link #getIndex()} should return the index that the documents will be inserted against
  * ElasticSearch; the {@code type} is taken from the DocumentBuilder
  * </p>
  * <p>
- * The action for each document is driven by the configured {@link ActionExtractor} instance. In the event of an
- * {@link DocumentAction#UPSERT} action then the same {@link XContentBuilder} from the {@link DocumentWrapper} is used as both the
- * update and upsert document via {@code doc(XContentBuilder}} and {@code upsert(XContentBuilder)}. This makes the assumption
- * that the document generated contains all the data required, not just a subset. If in doubt; stick to a normal
- * {@link DocumentAction#UPDATE} which will throw a {@code DocumentMissingException} failing the messages.
+ * The action for each document is driven by the configured {@link ActionExtractor} instance. In the
+ * event of an {@link DocumentAction#UPSERT} action then the same {@link XContentBuilder} from the
+ * {@link DocumentWrapper} is used as both the update and upsert document via
+ * {@code doc(XContentBuilder}} and {@code upsert(XContentBuilder)}. This makes the assumption that
+ * the document generated contains all the data required, not just a subset. If in doubt; stick to a
+ * normal {@link DocumentAction#UPDATE} which will throw a {@code DocumentMissingException} failing
+ * the messages.
  * </p>
  *
  * @config elastic-rest-bulk-operation

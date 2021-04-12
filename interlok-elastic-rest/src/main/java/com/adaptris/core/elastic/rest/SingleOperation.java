@@ -29,7 +29,6 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.elastic.DocumentAction;
 import com.adaptris.core.elastic.DocumentWrapper;
@@ -48,20 +47,23 @@ import lombok.Setter;
  * INDEX/UPDATE/DELETE a document(s) to ElasticSearch.
  *
  * <p>
- * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the index of document that we are submitting to into
+ * {@link #getIndex()} should return the index of document that we are submitting to into
  * ElasticSearch; the {@code type} will be derived from the DocumentWrapper itself.
  * </p>
  * <p>
- * Of course, you can configure a {@link ElasticDocumentBuilder} implementation that creates multiple documents, but this will mean
- * that all operations are made individually using the standard single document API rather than the BULK API. For performance
- * reasons you should consider using {@link BulkOperation} where appropriate.
+ * Of course, you can configure a {@link ElasticDocumentBuilder} implementation that creates
+ * multiple documents, but this will mean that all operations are made individually using the
+ * standard single document API rather than the BULK API. For performance reasons you should
+ * consider using {@link BulkOperation} where appropriate.
  * </p>
  * <p>
- * The action for each document is driven by the configured {@link ActionExtractor} instance. In the event of an
- * {@link DocumentAction#UPSERT} action then the same {@link XContentBuilder} from the {@link DocumentWrapper} is used as both the
- * update and upsert document via {@code source(XContentBuilder}} and {@code setUpsert(XContentBuilder)}. This makes the assumption
- * that the document generated contains all the data required, not just a subset. If in doubt; stick to a normal
- * {@link DocumentAction#UPDATE} which will correctly throw a {@code DocumentMissingException}.
+ * The action for each document is driven by the configured {@link ActionExtractor} instance. In the
+ * event of an {@link DocumentAction#UPSERT} action then the same {@link XContentBuilder} from the
+ * {@link DocumentWrapper} is used as both the update and upsert document via
+ * {@code source(XContentBuilder}} and {@code setUpsert(XContentBuilder)}. This makes the assumption
+ * that the document generated contains all the data required, not just a subset. If in doubt; stick
+ * to a normal {@link DocumentAction#UPDATE} which will correctly throw a
+ * {@code DocumentMissingException}.
  * </p>
  *
  *

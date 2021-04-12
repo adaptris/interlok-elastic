@@ -34,15 +34,15 @@ import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.transform.csv.BasicFormatBuilder;
-import com.adaptris.core.transform.csv.FormatBuilder;
+import com.adaptris.core.elastic.csv.BasicFormatBuilder;
+import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Builds a document for elastic search.
- * 
+ *
  * <p>
  * The document that is created contains the following characteristics
  * <ul>
@@ -54,7 +54,7 @@ import lombok.Setter;
  * <li>Any fields which matching "latitude"/"longitude" are aggregated and created as a {@code geo_point} field.
  * </ul>
  * </p>
- * 
+ *
  * @config elastic-csv-geopoint-document-builder
  *
  */
@@ -73,7 +73,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   @Getter
   @Setter
   private String latitudeFieldNames;
-  
+
   /**
    * A comma separated field name that should be considered the longitude field for a geopoint.
    * <p>
@@ -85,7 +85,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   @Getter
   @Setter
   private String longitudeFieldNames;
-  
+
   /**
    * The location field name within the elastic document.
    * <p>
@@ -95,7 +95,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   @AdvancedConfig
   @InputFieldDefault(value = "location")
   @Getter
-  @Setter  
+  @Setter
   private String locationFieldName;
 
   public CSVWithGeoPointBuilder() {
@@ -115,7 +115,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   private String latitudeFieldNames() {
     return ObjectUtils.defaultIfNull(getLatitudeFieldNames(), "latitude,lat");
   }
-  
+
   public CSVWithGeoPointBuilder withLongitudeFieldNames(String s) {
     setLongitudeFieldNames(s);
     return this;
@@ -133,7 +133,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   private String locationFieldName() {
     return ObjectUtils.defaultIfNull(getLocationFieldName(), "location");
   }
-  
+
   @Override
   protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
     Set<String> latitudeFieldNames = new HashSet<String>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
@@ -166,9 +166,9 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
         String uniqueId = record.get(idField);
         XContentBuilder builder = jsonBuilder();
         builder.startObject();
-        
+
         addTimestamp(builder);
-        
+
         for (int i = 0; i < record.size(); i++) {
           String fieldName = headers.get(i);
           String data = record.get(i);
@@ -186,17 +186,17 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
       return result;
     }
   }
-  
+
   private class LatLongHandler {
-    
+
     private final Set<String> latOrLongFieldNames;
-    
+
     private int lat = -1;
     private int lon = -1;
 
     LatLongHandler(Set<String> latitudeFieldNames, Set<String> longitudeFieldNames, List<String> headers) {
-      this.latOrLongFieldNames = new HashSet<String>(CollectionUtils.union(latitudeFieldNames, longitudeFieldNames));
-      
+      latOrLongFieldNames = new HashSet<String>(CollectionUtils.union(latitudeFieldNames, longitudeFieldNames));
+
       for (int i = 0; i < headers.size(); i++) {
         if (latitudeFieldNames.contains(headers.get(i).toLowerCase())) {
           lat = i;
@@ -216,14 +216,14 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
       String longitude = record.get(lon);
       try {
         builder.latlon(
-            getFieldNameMapper().map(locationFieldName()), 
-            Double.valueOf(latitude).doubleValue(), Double.valueOf(longitude).doubleValue());
+            getFieldNameMapper().map(locationFieldName()),
+            Double.parseDouble(latitude), Double.parseDouble(longitude));
       }
       catch (NumberFormatException e) {
         // Ignore it, no chance of having a location, because the values aren't real latlongs.
       }
     }
-    
+
     boolean isLatOrLong(String name) {
       return latOrLongFieldNames.contains(name.toLowerCase());
     }

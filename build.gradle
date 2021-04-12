@@ -1,15 +1,15 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-  id 'nebula.optional-base' version '5.0.3'  apply false
+  id 'nebula.optional-base' version '6.0.0'  apply false
   id "io.freefair.lombok" version "5.3.0" apply false
-  id 'com.github.spotbugs' version '4.6.0' apply false
-  id 'org.owasp.dependencycheck' version '6.0.5' apply false
+  id 'com.github.spotbugs' version '4.7.0' apply false
+  id 'org.owasp.dependencycheck' version '6.1.2' apply false
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.12-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.12-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.0-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.0-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -25,19 +25,18 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
   elasticVersion = '7.9.3'
-  junitJupiterVersion = '5.7.0'
-  mockitoVersion = '3.7.0'
+  junitJupiterVersion = '5.7.1'
+  mockitoVersion = '3.8.0'
 }
 
-
 ext.hasGraphViz = { ->
-  def app = "dot"
-  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-    app = app + ".exe"
-  }
-  return System.getenv("PATH").split(File.pathSeparator).any{
-    java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
-  }
+//  def app = "dot"
+//  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+//    app = app + ".exe"
+//  }
+//  return System.getenv("PATH").split(File.pathSeparator).any{
+//    java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
+//  }
 }
 
 ext.gitBranchNameOrTimestamp = { branchName ->
@@ -81,8 +80,8 @@ subprojects {
   apply plugin: 'org.owasp.dependencycheck'
   apply plugin: "io.freefair.lombok"
 
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
@@ -94,7 +93,6 @@ subprojects {
     maven { url "$nexusBaseUrl/content/groups/public" }
     maven { url "$nexusBaseUrl/content/groups/interlok" }
   }
-
 
   configurations {
     javadoc {}
@@ -113,6 +111,9 @@ subprojects {
     all*.exclude group: 'javax.validation', module: 'validation-api'
     all*.exclude group: 'javax.activation', module: 'activation'
     all*.exclude group: 'javax.activation', module: 'javax.activation-api'
+
+    // INTERLOK-3740 switch from jcraft to com.github.mwiede jsch fork.
+    all*.exclude group: 'com.jcraft', module: 'jsch'
   }
 
   configurations.all {
@@ -126,12 +127,12 @@ subprojects {
     compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.4.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.1")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.2")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.9")
+    implementation ("joda-time:joda-time:2.10.10")
 
     implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
       exclude group: "org.yaml", module: "snakeyaml"
@@ -141,7 +142,7 @@ subprojects {
       exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
 
-    implementation ("org.yaml:snakeyaml:1.27")
+    implementation ("org.yaml:snakeyaml:1.28")
     implementation ("commons-codec:commons-codec:1.15")
     implementation ("org.apache.httpcomponents:httpclient:4.5.13")
 
@@ -151,14 +152,14 @@ subprojects {
       because 'allows JUnit 3 and JUnit 4 tests to run'
     }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.0") {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.1") {
       because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
-    testImplementation ('junit:junit:4.13.1')
+    testImplementation ('junit:junit:4.13.2')
     testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
     // exclude any log4j dependencies so that we can just use slf4j simple.
     // works around INTERLOk-3233
@@ -166,7 +167,6 @@ subprojects {
       changing= true
       exclude group: "org.apache.logging.log4j"
     }
-
 
     testImplementation ("org.mockito:mockito-core:$mockitoVersion")
     testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
@@ -176,7 +176,6 @@ subprojects {
     offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
   }
 
-
   javadoc {
     configure(options) {
       options.tags('apiNote:a:API Note:', 'implSpec:a:Implementation Requirements:','implNote:a:Implementation Note:')
@@ -184,6 +183,7 @@ subprojects {
       options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
       taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
       options.addStringOption "tagletpath", configurations.javadoc.asPath
+      options.addBooleanOption "-no-module-directories", true
     }
   }
 
@@ -211,6 +211,7 @@ subprojects {
       versionFile.getParentFile().mkdirs()
       ant.propertyfile(file: versionFile) {
         entry(key: 'component.name', value: componentName)
+        entry(key: 'component.description', value: componentDesc)
         entry(key: 'build.version', value: releaseVersion)
         entry(key: 'groupId', value: project.group)
         entry(key: 'artifactId', value: project.name)
@@ -219,7 +220,6 @@ subprojects {
       }
     }
   }
-
 
   task offlinePackageList(type: Copy) {
     description 'Build an offline package-list for javadocs'
@@ -231,6 +231,7 @@ subprojects {
       }
     }
     include "package-list"
+    include "element-list"
     into offlineJavadocPackageDir
   }
 
@@ -264,7 +265,6 @@ subprojects {
 
   // disable spotbugsTests which checks our test code..
   spotbugsTest.enabled = false
-
 
   task lgtmCompile(type: JavaCompile, dependsOn: delombok) {
     group 'Build'

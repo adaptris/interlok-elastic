@@ -26,15 +26,15 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.ProducerCase;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.ServiceException;
 import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.elastic.CSVDocumentBuilder;
 import com.adaptris.core.elastic.SimpleDocumentBuilder;
 import com.adaptris.core.elastic.actions.ConfiguredAction;
+import com.adaptris.interlok.junit.scaffolding.ExampleProducerCase;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 
-public class BulkOperationTest extends ProducerCase {
+public class BulkOperationTest extends ExampleProducerCase {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--" + "\n-->\n";
   public static final String CSV_INPUT =
@@ -47,10 +47,7 @@ public class BulkOperationTest extends ProducerCase {
           + System.lineSeparator()
           + "UID-5,26N35S,Rape Winter,Fungicides,12,20150314,,200,Kilograms per Hectare,,0,52.71896363632868,-1.2391368098336788,233,217"
           + System.lineSeparator();
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+
   @Test
   public void testRefreshPolicy() throws Exception {
     BulkOperation producer = new BulkOperation();
@@ -69,7 +66,7 @@ public class BulkOperationTest extends ProducerCase {
     BulkOperation p = createProducerForTests("INDEX").withBatchWindow(3);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
 
@@ -82,7 +79,7 @@ public class BulkOperationTest extends ProducerCase {
     BulkOperation p = createProducerForTests("UPDATE").withBatchWindow(10);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
   @Test
@@ -94,7 +91,7 @@ public class BulkOperationTest extends ProducerCase {
     BulkOperation p = createProducerForTests("DELETE").withBatchWindow(1);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
   @Test
@@ -106,7 +103,7 @@ public class BulkOperationTest extends ProducerCase {
     BulkOperation p = createProducerForTests("UPSERT").withBatchWindow(1);
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    ServiceCase.execute(prod, msg);
+    ExampleServiceCase.execute(prod, msg);
   }
 
   @Test
@@ -119,7 +116,7 @@ public class BulkOperationTest extends ProducerCase {
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     try {
-      ServiceCase.execute(prod, msg);
+      ExampleServiceCase.execute(prod, msg);
       fail();
     } catch (ServiceException expected) {
 
@@ -135,7 +132,7 @@ public class BulkOperationTest extends ProducerCase {
     StandaloneProducer prod = new StandaloneProducer(conn, p);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     try {
-      ServiceCase.execute(prod, msg);
+      ExampleServiceCase.execute(prod, msg);
       fail();
     } catch (ServiceException expected) {
 

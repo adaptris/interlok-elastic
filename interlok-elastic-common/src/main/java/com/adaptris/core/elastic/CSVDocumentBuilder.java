@@ -28,15 +28,15 @@ import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.transform.csv.BasicFormatBuilder;
-import com.adaptris.core.transform.csv.FormatBuilder;
+import com.adaptris.core.elastic.csv.BasicFormatBuilder;
+import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Builds a simple document for elastic search.
- * 
+ *
  * <p>
  * The document that is created contains the following characteristics
  * <ul>
@@ -46,7 +46,7 @@ import lombok.Setter;
  * your configuration.</li>
  * </ul>
  * </p>
- * 
+ *
  * @config elastic-csv-document-builder
  *
  */
@@ -56,7 +56,7 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
 
   /**
    * Whether or not the document contains a header row.
-   * 
+   *
    * <p>This defaults to true unless otherwise specified</p>
    */
   @AdvancedConfig
