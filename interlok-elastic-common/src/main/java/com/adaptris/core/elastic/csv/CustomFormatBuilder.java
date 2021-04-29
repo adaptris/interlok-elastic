@@ -1,15 +1,16 @@
 package com.adaptris.core.elastic.csv;
 
-import java.lang.reflect.Method;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.Getter;
-import lombok.Setter;
+
+import java.lang.reflect.Method;
 
 /**
  * Implementation of {@link FormatBuilder} that allows for custom csv formats.
@@ -24,7 +25,8 @@ import lombok.Setter;
  *
  */
 @XStreamAlias("csv-custom-format")
-public class CustomFormatBuilder implements FormatBuilder {
+public class CustomFormatBuilder implements FormatBuilder
+{
 
   private transient Logger log = LoggerFactory.getLogger(this.getClass());
   private static final Character COMMA = Character.valueOf(',');

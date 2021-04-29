@@ -16,23 +16,28 @@
 
 package com.adaptris.core.elastic;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.BooleanUtils;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.elastic.csv.BasicFormatBuilder;
 import com.adaptris.core.elastic.csv.FormatBuilder;
+import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.BooleanUtils;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.supercsv.io.CsvListReader;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Builds a simple document for elastic search.
@@ -74,6 +79,12 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
     setFormat(f);
   }
 
+  public CSVDocumentBuilder(PreferenceBuilder p) {
+    super();
+    setPreference(p);
+    setUseSuperCsv(true);
+  }
+
   public CSVDocumentBuilder withUseHeaderRecord(Boolean b) {
     setUseHeaderRecord(b);
     return this;
@@ -84,8 +95,67 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   }
 
   @Override
-  protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
+  protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) {
     return new MyWrapper(parser);
+  }
+
+  @Override
+  protected CSVDocumentWrapper buildWrapper(CsvListReader reader, AdaptrisMessage message) {
+    return new SuperWrapper(reader);
+  }
+
+  private class SuperWrapper extends CSVDocumentWrapper {
+    private String[] headers = new String[0];
+    private List<String> next;
+
+    public SuperWrapper(CsvListReader r) {
+      super(r);
+      if (useHeaderRecord()) {
+        headers = buildHeaders(r);
+      }
+    }
+
+    @Override
+    public DocumentWrapper next() {
+      DocumentWrapper result = null;
+      try {
+        List<String> row = next;
+        next = null;
+        if (row != null) {
+          int idField = 0;
+          if (uniqueIdField() <= row.size()) {
+            idField = uniqueIdField();
+          } else {
+            throw new Exception("unique-id field > number of fields in record");
+          }
+          String uniqueId = row.get(idField);
+          XContentBuilder builder = jsonBuilder();
+          builder.startObject();
+          addTimestamp(builder);
+          for (int i = 0; i < row.size(); i++) {
+            String fieldName = getFieldNameMapper().map(headers.length > 0 ? headers[i] : "field_" + i);
+            String data = row.get(i);
+            builder.field(fieldName, new Text(data != null ? data : ""));
+          }
+          builder.endObject();
+
+          result = new DocumentWrapper(uniqueId, builder);
+        }
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      return result;
+    }
+
+    @Override
+    public boolean hasNext() {
+      try {
+        next = reader.read();
+        return next != null;
+      } catch (IOException e) {
+        return false;
+      }
+    }
   }
 
   private class MyWrapper extends CSVDocumentWrapper {

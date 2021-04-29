@@ -1,11 +1,12 @@
 package com.adaptris.core.elastic.csv;
 
-import javax.validation.constraints.NotNull;
-import org.apache.commons.csv.CSVFormat;
 import com.adaptris.annotation.AutoPopulated;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.csv.CSVFormat;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Implementation of {@link FormatBuilder} that maps the standard commons-csv formats.
@@ -137,5 +138,4 @@ public class BasicFormatBuilder implements FormatBuilder {
   public CSVFormat createFormat() {
     return getStyle().createFormat();
   }
-
 }

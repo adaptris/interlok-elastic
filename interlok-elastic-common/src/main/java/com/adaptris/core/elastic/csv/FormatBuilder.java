@@ -11,10 +11,11 @@ import org.apache.commons.csv.CSVFormat;
  * marked as deprecated just yet.
  * </p>
  */
-public interface FormatBuilder {
+public interface FormatBuilder
+{
 
   /**
-   * Create the CSVFormat.
+   * Create the CSVFormat Apache Commons CSV.
    *
    * @return the CSV Format.
    */
