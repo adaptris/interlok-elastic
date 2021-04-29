@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
  *
  * @config csv-basic-format
  */
+@Deprecated
 @XStreamAlias("csv-basic-format")
 public class BasicFormatBuilder implements FormatBuilder {
 

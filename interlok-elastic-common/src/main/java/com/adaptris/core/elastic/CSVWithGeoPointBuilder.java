@@ -145,10 +145,11 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   }
 
   @Override
+  @Deprecated
   protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
     Set<String> latitudeFieldNames = new HashSet<String>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
     Set<String> longitudeFieldNames = new HashSet<String>(Arrays.asList(longitudeFieldNames().toLowerCase().split(",")));
-    return new MyWrapper(latitudeFieldNames, longitudeFieldNames, parser);
+    return new ApacheWrapper(latitudeFieldNames, longitudeFieldNames, parser);
   }
 
   @Override
@@ -218,11 +219,12 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     }
   }
 
-  private class MyWrapper extends CSVDocumentWrapper {
+  @Deprecated
+  private class ApacheWrapper extends CSVDocumentWrapper {
     private List<String> headers = new ArrayList<>();
     private LatLongHandler latLong;
 
-    public MyWrapper(Set<String> latitudeFieldNames, Set<String> longitudeFieldNames, CSVParser p) {
+    public ApacheWrapper(Set<String> latitudeFieldNames, Set<String> longitudeFieldNames, CSVParser p) {
       super(p);
       headers = buildHeaders(csvIterator.next());
       latLong = new LatLongHandler(latitudeFieldNames, longitudeFieldNames, headers);

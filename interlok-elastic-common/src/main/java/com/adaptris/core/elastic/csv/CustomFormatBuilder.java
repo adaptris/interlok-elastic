@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
  * @config csv-custom-format
  *
  */
+@Deprecated
 @XStreamAlias("csv-custom-format")
 public class CustomFormatBuilder implements FormatBuilder
 {

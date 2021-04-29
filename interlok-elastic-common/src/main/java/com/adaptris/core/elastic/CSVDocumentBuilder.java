@@ -95,8 +95,9 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   }
 
   @Override
+  @Deprecated
   protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) {
-    return new MyWrapper(parser);
+    return new ApacheWrapper(parser);
   }
 
   @Override
@@ -158,10 +159,11 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
     }
   }
 
-  private class MyWrapper extends CSVDocumentWrapper {
+  @Deprecated
+  private class ApacheWrapper extends CSVDocumentWrapper {
     private List<String> headers = new ArrayList<>();
 
-    public MyWrapper(CSVParser p) {
+    public ApacheWrapper(CSVParser p) {
       super(p);
       if (useHeaderRecord()) {
         headers = buildHeaders(csvIterator.next());

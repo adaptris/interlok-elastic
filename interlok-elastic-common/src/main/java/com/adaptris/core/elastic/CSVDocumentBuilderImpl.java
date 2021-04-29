@@ -30,6 +30,7 @@ import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.PreferenceBuilder;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.util.NumberUtils;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -64,12 +65,12 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
    * Defaults to {@link BasicFormatBuilder} by default.
    * </p>
    */
-  @NotNull
   @AutoPopulated
   @Valid
   @Getter
   @Setter
-  @NonNull
+  @Deprecated
+  @ConfigDeprecated(removalVersion = "x.y.z", message = "Use 'preference' instead", groups = Deprecated.class)
   private FormatBuilder format;
 
   /**
@@ -79,6 +80,8 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
    * </p>
    */
   @AutoPopulated
+//  @NotNull
+//  @NonNull
   @Valid
   @Getter
   @Setter
@@ -220,19 +223,23 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     return result;
   }
 
+  @Deprecated
   protected abstract CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception;
 
   protected abstract CSVDocumentWrapper buildWrapper(CsvListReader reader, AdaptrisMessage message) throws Exception;
 
 
   protected abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator {
+    @Deprecated
     protected CSVParser parser;
+    @Deprecated
     protected Iterator<CSVRecord> csvIterator;
 
     protected CsvListReader reader;
 
     private boolean iteratorInvoked = false;
 
+    @Deprecated
     public CSVDocumentWrapper(CSVParser p) {
       parser = p;
       csvIterator = p.iterator();

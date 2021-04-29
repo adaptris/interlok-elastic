@@ -11,6 +11,7 @@ import org.apache.commons.csv.CSVFormat;
  * marked as deprecated just yet.
  * </p>
  */
+@Deprecated
 public interface FormatBuilder
 {
 
