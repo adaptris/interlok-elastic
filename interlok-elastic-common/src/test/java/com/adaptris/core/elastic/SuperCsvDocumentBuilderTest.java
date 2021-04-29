@@ -6,9 +6,15 @@ import com.adaptris.core.elastic.fields.NoOpFieldNameMapper;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.BasicPreferenceBuilder.Style;
 import com.adaptris.interlok.util.CloseableIterable;
+import com.jayway.jsonpath.ReadContext;
+import org.elasticsearch.common.Strings;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
 
@@ -32,4 +38,36 @@ public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
     // No headers so the count is the data count + 1
     assertEquals(6, count);
   }
+
+  @Test
+  public void testFormatAndPreference() throws Exception {
+    CSVDocumentBuilder preference = createBuilder();
+    CSVDocumentBuilder format = new CsvDocumentBuilderTest().createBuilder();
+
+    AdaptrisMessage pMessage = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    AdaptrisMessage fMessage = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+
+    Map<String, String> pIDs = new HashMap<>();
+    Map<String, String> fIDs = new HashMap<>();
+
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(preference.build(pMessage))) {
+      for (DocumentWrapper doc : docs) {
+        ReadContext context = parse(Strings.toString(doc.content()));
+        pIDs.put(context.read(JSON_PRODUCTUNIQUEID), doc.uniqueId());
+      }
+    }
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(format.build(fMessage))) {
+      for (DocumentWrapper doc : docs) {
+        ReadContext context = parse(Strings.toString(doc.content()));
+        fIDs.put(context.read(JSON_PRODUCTUNIQUEID), doc.uniqueId());
+      }
+    }
+
+    assertTrue(pIDs.size() == fIDs.size());
+    for (String key : pIDs.keySet()) {
+      assertTrue(fIDs.containsKey(key));
+      assertEquals(pIDs.get(key), fIDs.get(key));
+    }
+  }
+
 }
