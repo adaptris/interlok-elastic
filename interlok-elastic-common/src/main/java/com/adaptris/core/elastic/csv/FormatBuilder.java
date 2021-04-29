@@ -7,16 +7,17 @@ import org.apache.commons.csv.CSVFormat;
  *
  * <p>
  * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and will eventually
- * be deprecated so that we switch to using a net.supercsv based implementations instead. It is not
- * marked as deprecated just yet.
+ * be deprecated so that we switch to using a net.supercsv based implementations instead.
  * </p>
+ *
+ * @deprecated Use {@link com.adaptris.csv.PreferenceBuilder} instead.
  */
-@Deprecated
+@Deprecated(since = "4.1.0")
 public interface FormatBuilder
 {
 
   /**
-   * Create the CSVFormat Apache Commons CSV.
+   * Create the CSVFormat.
    *
    * @return the CSV Format.
    */

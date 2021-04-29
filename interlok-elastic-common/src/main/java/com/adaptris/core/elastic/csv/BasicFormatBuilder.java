@@ -19,13 +19,13 @@ import javax.validation.constraints.NotNull;
  * </p>
  * <p>
  * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and will eventually
- * be deprecated so that we switch to using a net.supercsv based implementations instead. It is not
- * marked as deprecated just yet.
+ * be deprecated so that we switch to using a net.supercsv based implementations instead.
  * </p>
  *
+ * @deprecated Use {@link com.adaptris.csv.BasicPreferenceBuilder} instead.
  * @config csv-basic-format
  */
-@Deprecated
+@Deprecated(since = "4.1.0")
 @XStreamAlias("csv-basic-format")
 public class BasicFormatBuilder implements FormatBuilder {
 

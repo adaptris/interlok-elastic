@@ -17,14 +17,13 @@ import java.lang.reflect.Method;
  *
  * <p>
  * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and will eventually
- * be deprecated so that we switch to using a net.supercsv based implementations instead. It is not
- * marked as deprecated just yet.
+ * be deprecated so that we switch to using a net.supercsv based implementations instead.
  * </p>
  *
+ * @deprecated Use {@link com.adaptris.csv.CustomPreferenceBuilder} instead.
  * @config csv-custom-format
- *
  */
-@Deprecated
+@Deprecated(since = "4.1.0")
 @XStreamAlias("csv-custom-format")
 public class CustomFormatBuilder implements FormatBuilder
 {
