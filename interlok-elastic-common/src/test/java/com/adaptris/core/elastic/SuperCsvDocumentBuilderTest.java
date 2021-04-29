@@ -2,6 +2,8 @@ package com.adaptris.core.elastic;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
+import com.adaptris.core.CoreException;
+import com.adaptris.core.elastic.csv.BasicFormatBuilder;
 import com.adaptris.core.elastic.fields.NoOpFieldNameMapper;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.BasicPreferenceBuilder.Style;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
 
@@ -29,6 +32,35 @@ public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
     msg.addMetadata(testName.getMethodName(), testName.getMethodName());
     CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false);
+    int count = 0;
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
+      for (DocumentWrapper doc : docs) {
+        count++;
+      }
+    }
+    // No headers so the count is the data count + 1
+    assertEquals(6, count);
+  }
+
+  @Test
+  public void testInvalidArgumentsNone() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false).withPreferences(null).withFormat(null);
+
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
+      fail();
+    } catch (CoreException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void testInvalidArgumentsTooMany() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
+    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false).withFormat(new BasicFormatBuilder());
+
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
