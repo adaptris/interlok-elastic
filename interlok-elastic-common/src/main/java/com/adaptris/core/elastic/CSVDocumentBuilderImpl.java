@@ -70,7 +70,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   @Getter
   @Setter
   @Deprecated
-  @ConfigDeprecated(removalVersion = "x.y.z", message = "Use 'preference' instead", groups = Deprecated.class)
+  @ConfigDeprecated(/*removalVersion = "x.y.z",*/ message = "Use 'preference' instead", groups = Deprecated.class)
   private FormatBuilder format;
 
   /**

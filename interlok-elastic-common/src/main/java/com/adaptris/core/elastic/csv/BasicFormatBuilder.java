@@ -18,8 +18,8 @@ import javax.validation.constraints.NotNull;
  * TAB DELIMITED} which correspond to the base formats defined by {@link CSVFormat}.
  * </p>
  * <p>
- * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and will eventually
- * be deprecated so that we switch to using a net.supercsv based implementations instead.
+ * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and is now
+ * deprecated so switch to using a net.supercsv based implementations instead.
  * </p>
  *
  * @deprecated Use {@link com.adaptris.csv.BasicPreferenceBuilder} instead.
