@@ -26,6 +26,7 @@ import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.adaptris.core.elastic.fields.FieldNameMapper;
 import com.adaptris.core.elastic.fields.NoOpFieldNameMapper;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.csv.PreferenceBuilder;
 import com.adaptris.interlok.util.CloseableIterable;
@@ -38,7 +39,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,9 +68,8 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   @AutoPopulated
   @Valid
   @Getter
-  @Setter
   @Deprecated
-  @ConfigDeprecated(/*removalVersion = "x.y.z",*/ message = "Use 'preference' instead", groups = Deprecated.class)
+  @ConfigDeprecated(removalVersion = "5.0.0", message = "Use 'preference' instead", groups = Deprecated.class)
   private FormatBuilder format;
 
   /**
@@ -123,21 +122,16 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   @Setter
   private String addTimestampField;
 
-  @AdvancedConfig
-  @Getter
-  @Setter
-  @InputFieldDefault("false")
-  private Boolean useSuperCsv;
+  private transient boolean logApacheWarning = false;
 
   protected transient Logger log = LoggerFactory.getLogger(this.getClass());
 
   public CSVDocumentBuilderImpl() {
-    setFormat(new BasicFormatBuilder());
-    setPreference(new BasicPreferenceBuilder());
     setFieldNameMapper(new NoOpFieldNameMapper());
   }
 
   @SuppressWarnings("unchecked")
+  @Deprecated
   public <T extends CSVDocumentBuilderImpl> T withFormat(FormatBuilder format) {
     setFormat(format);
     return (T) this;
@@ -146,12 +140,13 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   @SuppressWarnings("unchecked")
   public <T extends CSVDocumentBuilderImpl> T withPreferences(PreferenceBuilder preference) {
     setPreference(preference);
-    return withSuperCsv();
+    return (T) this;
   }
 
-  public <T extends CSVDocumentBuilderImpl> T withSuperCsv() {
-    useSuperCsv = true;
-    return (T)this;
+  @Deprecated
+  public void setFormat(FormatBuilder format) {
+    this.format = format;
+    LoggingHelper.logDeprecation(logApacheWarning, () -> logApacheWarning = true, "format", "preference");
   }
 
   @SuppressWarnings("unchecked")
@@ -207,14 +202,22 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     CSVDocumentWrapper result = null;
     try {
 
-      if (useSuperCsv()) {
-        CsvPreference preference = getPreference().build();
-        CsvListReader reader = new CsvListReader(msg.getReader(), preference);
-        result = buildWrapper(reader, msg);
-      } else {
+      if (getFormat() == null && getPreference() == null) {
+        log.error("");
+        throw new IllegalArgumentException("Missing either 'format' or 'preference'");
+      }
+      if (getFormat() != null && getPreference() != null) {
+        log.warn("Do not use both 'format' and 'preference' - defaulting to 'format' for now");
+      }
+
+      if (getFormat() != null) {
         CSVFormat format = getFormat().createFormat();
         CSVParser parser = format.parse(msg.getReader());
         result = buildWrapper(parser, msg);
+      } else {
+        CsvPreference preference = getPreference().build();
+        CsvListReader reader = new CsvListReader(msg.getReader(), preference);
+        result = buildWrapper(reader, msg);
       }
     }
     catch (Exception e) {
@@ -269,9 +272,5 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
       IOUtils.closeQuietly(parser);
       IOUtils.closeQuietly(reader);
     }
-  }
-
-  private boolean useSuperCsv() {
-    return BooleanUtils.toBooleanDefaultIfNull(useSuperCsv, false);
   }
 }

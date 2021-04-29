@@ -20,7 +20,6 @@ import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.elastic.csv.BasicFormatBuilder;
 import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -71,9 +70,10 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   private Boolean useHeaderRecord;
 
   public CSVDocumentBuilder() {
-    this(new BasicFormatBuilder());
+    super();
   }
 
+  @Deprecated
   public CSVDocumentBuilder(FormatBuilder f) {
     super();
     setFormat(f);
@@ -82,7 +82,6 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   public CSVDocumentBuilder(PreferenceBuilder p) {
     super();
     setPreference(p);
-    setUseSuperCsv(true);
   }
 
   public CSVDocumentBuilder withUseHeaderRecord(Boolean b) {

@@ -20,7 +20,6 @@ import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.elastic.csv.BasicFormatBuilder;
 import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -103,9 +102,10 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   private String locationFieldName;
 
   public CSVWithGeoPointBuilder() {
-    this(new BasicFormatBuilder());
+    super();
   }
 
+  @Deprecated
   public CSVWithGeoPointBuilder(FormatBuilder f) {
     super();
     setFormat(f);
@@ -114,7 +114,6 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   public CSVWithGeoPointBuilder(PreferenceBuilder p) {
     super();
     setPreference(p);
-    setUseSuperCsv(true);
   }
 
   public CSVWithGeoPointBuilder withLatitudeFieldNames(String s) {
