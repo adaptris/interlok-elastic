@@ -1,11 +1,12 @@
 package com.adaptris.core.elastic.csv;
 
-import javax.validation.constraints.NotNull;
-import org.apache.commons.csv.CSVFormat;
 import com.adaptris.annotation.AutoPopulated;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.csv.CSVFormat;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Implementation of {@link FormatBuilder} that maps the standard commons-csv formats.
@@ -17,13 +18,14 @@ import lombok.Setter;
  * TAB DELIMITED} which correspond to the base formats defined by {@link CSVFormat}.
  * </p>
  * <p>
- * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and will eventually
- * be deprecated so that we switch to using a net.supercsv based implementations instead. It is not
- * marked as deprecated just yet.
+ * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and is now
+ * deprecated so switch to using a net.supercsv based implementations instead.
  * </p>
  *
+ * @deprecated Use {@link com.adaptris.csv.BasicPreferenceBuilder} instead.
  * @config csv-basic-format
  */
+@Deprecated(since = "4.1.0")
 @XStreamAlias("csv-basic-format")
 public class BasicFormatBuilder implements FormatBuilder {
 
@@ -137,5 +139,4 @@ public class BasicFormatBuilder implements FormatBuilder {
   public CSVFormat createFormat() {
     return getStyle().createFormat();
   }
-
 }
