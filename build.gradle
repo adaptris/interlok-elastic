@@ -26,7 +26,7 @@ ext {
   slf4jVersion = '1.7.30'
   elasticVersion = '7.9.3'
   junitJupiterVersion = '5.7.2'
-  mockitoVersion = '3.10.0'
+  mockitoVersion = '3.11.0'
 }
 
 ext.hasGraphViz = { ->
