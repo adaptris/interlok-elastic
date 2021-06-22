@@ -6,12 +6,15 @@ import org.apache.commons.csv.CSVFormat;
  * Builder for creating the required format for parsing the CSV file.
  *
  * <p>
- * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and will eventually
- * be deprecated so that we switch to using a net.supercsv based implementations instead. It is not
- * marked as deprecated just yet.
+ * Note that this was lifted from the {@code com.adaptris:interlok-csv} project and is now
+ * deprecated so switch to using a net.supercsv based implementations instead.
  * </p>
+ *
+ * @deprecated Use {@link com.adaptris.csv.PreferenceBuilder} instead.
  */
-public interface FormatBuilder {
+@Deprecated(since = "4.1.0")
+public interface FormatBuilder
+{
 
   /**
    * Create the CSVFormat.

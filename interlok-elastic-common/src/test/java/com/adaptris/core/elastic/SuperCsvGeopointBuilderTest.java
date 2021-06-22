@@ -2,8 +2,9 @@ package com.adaptris.core.elastic;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.elastic.csv.BasicFormatBuilder;
 import com.adaptris.core.elastic.fields.ToUpperCaseFieldNameMapper;
+import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.BasicPreferenceBuilder.Style;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
@@ -18,7 +19,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class CsvGeopointBuilderTest extends CsvBuilderCase {
+public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
 
   private static final String JSON_LOCATION = "$.location";
 
@@ -56,14 +57,14 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
 
   @Override
   protected CSVWithGeoPointBuilder createBuilder() {
-    return new CSVWithGeoPointBuilder().withLatitudeFieldNames("latitude,lat").withLongitudeFieldNames("longitude,lon")
-        .withLocationFieldName("location").withFormat(new BasicFormatBuilder());
+    return new CSVWithGeoPointBuilder(new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE)).withLatitudeFieldNames("latitude,lat").withLongitudeFieldNames("longitude,lon")
+        .withLocationFieldName("location");
   }
 
   @Test
   public void testBuild_WithTimestamp() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder()).withAddTimestampField("My_Timestamp");
+    CSVWithGeoPointBuilder documentBuilder = createBuilder().withAddTimestampField("My_Timestamp");
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
@@ -84,7 +85,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_WithLatLong() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder());
+    CSVWithGeoPointBuilder documentBuilder = createBuilder();
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
@@ -104,7 +105,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_WithLatLongAndMapper() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder());
+    CSVWithGeoPointBuilder documentBuilder = createBuilder();
     documentBuilder.setFieldNameMapper(new ToUpperCaseFieldNameMapper());
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
@@ -126,7 +127,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
   public void testBuild_WithCustomLatLong() throws Exception {
     String payload = CSV_WITH_LATLON.replace("latitude", "my_lat").replace("longitude", "my_lon");
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(payload);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder());
+    CSVWithGeoPointBuilder documentBuilder = createBuilder();
     documentBuilder.setLatitudeFieldNames("My_Lat");
     documentBuilder.setLongitudeFieldNames("My_Lon");
     documentBuilder.setLocationFieldName("My_Location");
@@ -149,7 +150,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_WithLatLongAndDelta() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLON_AND_DELTA);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder());
+    CSVWithGeoPointBuilder documentBuilder = createBuilder();
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
@@ -169,7 +170,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_WithoutLatLon() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITHOUT_LATLON);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder());
+    CSVWithGeoPointBuilder documentBuilder = createBuilder();
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
@@ -190,7 +191,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_WithoutLatLonHeaders() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_NO_LATLON_COLUMNS);
-    CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder(new BasicFormatBuilder());
+    CSVWithGeoPointBuilder documentBuilder = createBuilder();
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {

@@ -16,23 +16,6 @@
 
 package com.adaptris.core.elastic;
 
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.IOUtils;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
@@ -43,11 +26,36 @@ import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.adaptris.core.elastic.fields.FieldNameMapper;
 import com.adaptris.core.elastic.fields.NoOpFieldNameMapper;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.core.util.LoggingHelper;
+import com.adaptris.csv.BasicPreferenceBuilder;
+import com.adaptris.csv.PreferenceBuilder;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.util.NumberUtils;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.IOUtils;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.supercsv.io.CsvListReader;
+import org.supercsv.prefs.CsvPreference;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
 
@@ -57,13 +65,27 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
    * Defaults to {@link BasicFormatBuilder} by default.
    * </p>
    */
-  @NotNull
   @AutoPopulated
   @Valid
   @Getter
-  @Setter
-  @NonNull
+  @Deprecated
+  @ConfigDeprecated(removalVersion = "5.0.0", message = "Use 'preference' instead", groups = Deprecated.class)
   private FormatBuilder format;
+
+  /**
+   * The format of the CSV file.
+   * <p>
+   * Defaults to {@link BasicPreferenceBuilder} by default.
+   * </p>
+   */
+  @AutoPopulated
+//  @NotNull
+//  @NonNull
+  @Valid
+  @Getter
+  @Setter
+  private PreferenceBuilder preference;
+
   /**
    * Which field in your CSV is considered the unique-id.
    * <p>
@@ -100,17 +122,31 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   @Setter
   private String addTimestampField;
 
+  private transient boolean logApacheWarning = false;
+
   protected transient Logger log = LoggerFactory.getLogger(this.getClass());
 
   public CSVDocumentBuilderImpl() {
-    setFormat(new BasicFormatBuilder());
     setFieldNameMapper(new NoOpFieldNameMapper());
   }
 
   @SuppressWarnings("unchecked")
+  @Deprecated
   public <T extends CSVDocumentBuilderImpl> T withFormat(FormatBuilder format) {
     setFormat(format);
     return (T) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends CSVDocumentBuilderImpl> T withPreferences(PreferenceBuilder preference) {
+    setPreference(preference);
+    return (T) this;
+  }
+
+  @Deprecated
+  public void setFormat(FormatBuilder format) {
+    this.format = format;
+    LoggingHelper.logDeprecation(logApacheWarning, () -> logApacheWarning = true, "format", "preference");
   }
 
   @SuppressWarnings("unchecked")
@@ -149,6 +185,14 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     return result;
   }
 
+  protected String[] buildHeaders(CsvListReader mapReader)  {
+    try {
+      return mapReader.getHeader(true);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   private String safeName(String input) {
     return defaultIfBlank(input, "").trim().replaceAll(" ", "_");
   }
@@ -157,9 +201,24 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
     CSVDocumentWrapper result = null;
     try {
-      CSVFormat format = getFormat().createFormat();
-      CSVParser parser = format.parse(msg.getReader());
-      result = buildWrapper(parser, msg);
+
+      if (getFormat() == null && getPreference() == null) {
+        log.error("");
+        throw new IllegalArgumentException("Missing either 'format' or 'preference'");
+      }
+      if (getFormat() != null && getPreference() != null) {
+        log.warn("Do not use both 'format' and 'preference' - defaulting to 'format' for now");
+      }
+
+      if (getFormat() != null) {
+        CSVFormat format = getFormat().createFormat();
+        CSVParser parser = format.parse(msg.getReader());
+        result = buildWrapper(parser, msg);
+      } else {
+        CsvPreference preference = getPreference().build();
+        CsvListReader reader = new CsvListReader(msg.getReader(), preference);
+        result = buildWrapper(reader, msg);
+      }
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
@@ -167,17 +226,30 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     return result;
   }
 
+  @Deprecated
   protected abstract CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception;
+
+  protected abstract CSVDocumentWrapper buildWrapper(CsvListReader reader, AdaptrisMessage message) throws Exception;
 
 
   protected abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator {
+    @Deprecated
     protected CSVParser parser;
+    @Deprecated
     protected Iterator<CSVRecord> csvIterator;
+
+    protected CsvListReader reader;
+
     private boolean iteratorInvoked = false;
 
+    @Deprecated
     public CSVDocumentWrapper(CSVParser p) {
       parser = p;
       csvIterator = p.iterator();
+    }
+
+    public CSVDocumentWrapper(CsvListReader r) {
+      reader = r;
     }
 
     @Override
@@ -198,7 +270,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     @SuppressWarnings("deprecation")
     public void close() throws IOException {
       IOUtils.closeQuietly(parser);
+      IOUtils.closeQuietly(reader);
     }
-
   }
 }

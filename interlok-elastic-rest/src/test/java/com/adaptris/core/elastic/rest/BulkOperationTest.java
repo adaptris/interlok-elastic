@@ -16,14 +16,6 @@
 
 package com.adaptris.core.elastic.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.common.unit.TimeValue;
-import org.junit.Test;
-import org.mockito.Mockito;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
@@ -31,8 +23,18 @@ import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.elastic.CSVDocumentBuilder;
 import com.adaptris.core.elastic.SimpleDocumentBuilder;
 import com.adaptris.core.elastic.actions.ConfiguredAction;
+import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.interlok.junit.scaffolding.ExampleProducerCase;
 import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.common.unit.TimeValue;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 
 public class BulkOperationTest extends ExampleProducerCase {
 
@@ -166,7 +168,7 @@ public class BulkOperationTest extends ExampleProducerCase {
 
   private BulkOperation createProducerForTests(String action) {
     BulkOperation producer = new BulkOperation().withAction(new ConfiguredAction().withAction(action))
-        .withDocumentBuilder(new CSVDocumentBuilder().withUseHeaderRecord(true))
+        .withDocumentBuilder(new CSVDocumentBuilder(new BasicPreferenceBuilder()).withUseHeaderRecord(true))
         .withRefreshPolicy(null)
             .withIndex("myIndex");
     return producer;
