@@ -23,10 +23,10 @@ ext {
   componentName='Interlok Elasticsearch'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.30'
+  slf4jVersion = '1.7.31'
   elasticVersion = '7.9.3'
   junitJupiterVersion = '5.7.2'
-  mockitoVersion = '3.11.1'
+  mockitoVersion = '3.11.2'
 }
 
 ext.hasGraphViz = { ->
