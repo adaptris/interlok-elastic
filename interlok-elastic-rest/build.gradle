@@ -5,8 +5,8 @@ ext {
 }
 
 dependencies {
-  compile project(':interlok-elastic-common')
-  compile ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
+  api project(':interlok-elastic-common')
+  api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
 
 }
 
