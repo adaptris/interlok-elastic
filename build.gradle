@@ -70,6 +70,20 @@ task clean(type: Delete) {
   delete project.buildDir
 }
 
+allprojects {
+  tasks.withType(Jar) {
+    metaInf {
+      from ("$rootDir") {
+        include 'LICENSE*'
+        include 'NOTICE*'
+      }
+    }
+  }
+  tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+  }
+}
+
 subprojects {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
@@ -85,12 +99,6 @@ subprojects {
   version = releaseVersion
   def versionDir = "$buildDir/version"
   generateLombokConfig.enabled = false
-
-  // Disable gradle module generation since we probably don't want
-  // xxx.module files in your repository.
-  tasks.withType(GenerateModuleMetadata) {
-    enabled = false
-  }
 
   repositories {
     mavenCentral()
