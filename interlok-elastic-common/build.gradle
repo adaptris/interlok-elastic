@@ -9,7 +9,7 @@ dependencies {
   api ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
   // INTERLOK-3559 since we removed apache-csv out of interlok-csv it's
   // a bigger deal to remove it out of elastic
-  api("org.apache.commons:commons-csv:1.8")
+  api("org.apache.commons:commons-csv:1.9.0")
   api("net.sf.supercsv:super-csv:2.4.0")
 }
 
