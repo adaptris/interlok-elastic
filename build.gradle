@@ -3,30 +3,30 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
   id 'nebula.optional-base' version '6.0.0'  apply false
   id "io.freefair.lombok" version "5.3.3.3" apply false
-  id 'com.github.spotbugs' version '4.7.1' apply false
-  id 'org.owasp.dependencycheck' version '6.2.0' apply false
+  id 'com.github.spotbugs' version '4.7.2' apply false
+  id 'org.owasp.dependencycheck' version '6.2.2' apply false
 }
 
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '4.1-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '4.1-SNAPSHOT'
-  nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
-  mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.2-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.2-SNAPSHOT'
+  nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
+  mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
-  repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
-  repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
-  defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
+  repoUsername = project.findProperty('repoUsername') ?: 'unknown'
+  repoPassword = project.findProperty('repoPassword') ?: 'unknown'
+  defaultNexusRepo = project.findProperty('defaultNexusRepo') ?: 'unknown'
+  interlokJavadocs= project.findProperty('interlokJavadocs') ?: javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
+  interlokCommonJavadocs= project.findProperty('interlokCommonJavadocs') ?: javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
   offlineJavadocPackageDir = new File(project.buildDir, "offline-javadoc-packages")
 
-  interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
-  interlokCommonJavadocs= project.hasProperty('interlokCommonJavadocs') ? project.getProperty('interlokCommonJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
   componentName='Interlok Elasticsearch'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.30'
-  elasticVersion = '7.9.3'
+  slf4jVersion = '1.7.32'
+  elasticVersion = '7.13.4'
   junitJupiterVersion = '5.7.2'
-  mockitoVersion = '3.11.0'
+  mockitoVersion = '3.11.2'
 }
 
 ext.hasGraphViz = { ->
@@ -70,11 +70,24 @@ task clean(type: Delete) {
   delete project.buildDir
 }
 
+allprojects {
+  tasks.withType(Jar) {
+    metaInf {
+      from ("$rootDir") {
+        include 'LICENSE*'
+        include 'NOTICE*'
+      }
+    }
+  }
+  tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+  }
+}
+
 subprojects {
-  apply plugin: 'java'
-  apply plugin: 'maven'
+  apply plugin: 'java-library'
   apply plugin: 'maven-publish'
-  apply plugin: "jacoco"
+  apply plugin: 'jacoco'
   apply plugin: "nebula.optional-base"
   apply plugin: 'com.github.spotbugs'
   apply plugin: 'org.owasp.dependencycheck'
@@ -89,7 +102,12 @@ subprojects {
 
   repositories {
     mavenCentral()
-    maven { url "$defaultNexusRepo" }
+    if (defaultNexusRepo != "unknown") {
+      maven {
+        url "$defaultNexusRepo"
+        allowInsecureProtocol true
+      }
+    }
     maven { url "$nexusBaseUrl/content/groups/public" }
     maven { url "$nexusBaseUrl/content/groups/interlok" }
   }
@@ -123,11 +141,11 @@ subprojects {
   dependencies {
     annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-    compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
-    compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-    compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
+    api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
+    api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
+    api ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.6.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.3")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.4")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
@@ -142,7 +160,7 @@ subprojects {
       exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
 
-    implementation ("org.yaml:snakeyaml:1.28")
+    implementation ("org.yaml:snakeyaml:1.29")
     implementation ("commons-codec:commons-codec:1.15")
     implementation ("org.apache.httpcomponents:httpclient:4.5.13")
 
@@ -160,13 +178,8 @@ subprojects {
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
     testImplementation ('junit:junit:4.13.2')
-    testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
-    // exclude any log4j dependencies so that we can just use slf4j simple.
-    // works around INTERLOk-3233
-    testImplementation "com.adaptris:interlok-stubs:$interlokCoreVersion", {
-      changing= true
-      exclude group: "org.apache.logging.log4j"
-    }
+    testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
+    testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
 
     testImplementation ("org.mockito:mockito-core:$mockitoVersion")
     testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
@@ -183,6 +196,7 @@ subprojects {
       options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
       taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
       options.addStringOption "tagletpath", configurations.javadoc.asPath
+      options.addStringOption('Xdoclint:none', '-quiet')
       options.addBooleanOption "-no-module-directories", true
     }
   }
@@ -193,8 +207,8 @@ subprojects {
 
   jacocoTestReport {
     reports {
-      xml.enabled true
-      html.enabled true
+      xml.required= true
+      html.required= true
     }
   }
 
@@ -250,11 +264,14 @@ subprojects {
         enabled = true
       }
     }
- }
+    // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
+    // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
+
+  }
 
   dependencyCheck  {
     suppressionFiles= [ "https://raw.githubusercontent.com/adaptris/interlok/develop/gradle/owasp-exclude.xml" ]
-    skipConfigurations = [ "antSql", "spotbugs", "umlDoclet", "offlineJavadocPackages", "javadoc", "jacocoAnt", "jacocoAgent", "spotbugsPlugins", "spotbugsSlf4j" ]
+    scanConfigurations = [ "api", "compileClasspath", "runtimeClasspath" ]
     formats = [ "HTML", "JUNIT" ]
     junitFailOnCVSS = 7.0
     failBuildOnCVSS = 7.0
@@ -271,7 +288,7 @@ subprojects {
     description 'Compile for lgtm'
 
     source = sourceSets.main.extensions.delombokTask
-    destinationDir = sourceSets.main.java.outputDir
+    destinationDirectory= sourceSets.main.java.classesDirectory
     classpath = project.sourceSets.main.compileClasspath
   }
 
