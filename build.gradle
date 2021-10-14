@@ -150,7 +150,7 @@ subprojects {
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.10")
+    implementation ("joda-time:joda-time:2.10.12")
 
     implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
       exclude group: "org.yaml", module: "snakeyaml"
