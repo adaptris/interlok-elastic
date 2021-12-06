@@ -1,15 +1,15 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-  id 'nebula.optional-base' version '6.0.0'  apply false
-  id "io.freefair.lombok" version "5.3.3.3" apply false
-  id 'com.github.spotbugs' version '4.7.2' apply false
-  id 'org.owasp.dependencycheck' version '6.2.2' apply false
+  id 'nebula.optional-base' version '7.0.0'  apply false
+  id "io.freefair.lombok" version "6.2.0" apply false
+  id 'com.github.spotbugs' version '4.7.9' apply false
+  id 'org.owasp.dependencycheck' version '6.5.0.1' apply false
 }
 
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.2-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.2-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.3-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.3-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -24,9 +24,9 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.32'
-  elasticVersion = '7.13.4'
-  junitJupiterVersion = '5.7.2'
-  mockitoVersion = '3.11.2'
+  elasticVersion = '7.15.1'
+  junitJupiterVersion = '5.8.1'
+  mockitoVersion = '4.0.0'
 }
 
 ext.hasGraphViz = { ->
@@ -98,7 +98,7 @@ subprojects {
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
-  generateLombokConfig.enabled = false
+  lombok.disableConfig = true
 
   repositories {
     mavenCentral()
@@ -145,12 +145,12 @@ subprojects {
     api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     api ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
     implementation ("com.jayway.jsonpath:json-path:2.6.0")
-    implementation ("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
 
-    implementation ("joda-time:joda-time:2.10.10")
+    implementation ("joda-time:joda-time:2.10.13")
 
     implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
       exclude group: "org.yaml", module: "snakeyaml"
@@ -170,7 +170,7 @@ subprojects {
       because 'allows JUnit 3 and JUnit 4 tests to run'
     }
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.2") {
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.8.1") {
       because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
