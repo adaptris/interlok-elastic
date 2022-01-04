@@ -162,7 +162,7 @@ subprojects {
       exclude group: "org.apache.httpcomponents", module: "httpclient"
     }
 
-    implementation ("org.yaml:snakeyaml:1.29")
+    implementation ("org.yaml:snakeyaml:1.30")
     implementation ("commons-codec:commons-codec:1.15")
     implementation ("org.apache.httpcomponents:httpclient:4.5.13")
 
