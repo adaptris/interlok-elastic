@@ -145,7 +145,7 @@ subprojects {
     api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
     api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     api ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
-    implementation ("com.jayway.jsonpath:json-path:2.6.0")
+    implementation ("com.jayway.jsonpath:json-path:2.7.0")
     implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.1")
     implementation ("commons-collections:commons-collections:3.2.2")
 
