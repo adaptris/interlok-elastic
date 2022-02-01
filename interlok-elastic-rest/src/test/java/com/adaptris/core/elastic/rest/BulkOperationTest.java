@@ -27,7 +27,7 @@ import com.adaptris.csv.BasicPreferenceBuilder;
 import com.adaptris.interlok.junit.scaffolding.ExampleProducerCase;
 import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.junit.Test;
 import org.mockito.Mockito;
 

@@ -2,11 +2,20 @@ ext {
   componentName='Interlok Storage/Elastic: REST Client'
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+  elasticVersion = '7.10.2'
 }
 
 dependencies {
   api project(':interlok-elastic-common')
   api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
+
+  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
+    exclude group: "org.yaml", module: "snakeyaml"
+  }
+  implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion") {
+    exclude group: "commons-codec", module: "commons-codec"
+    exclude group: "org.apache.httpcomponents", module: "httpclient"
+  }
 
 }
 

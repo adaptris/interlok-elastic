@@ -150,17 +150,9 @@ subprojects {
     implementation ("commons-collections:commons-collections:3.2.2")
 
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
-	implementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
-	
-    implementation ("joda-time:joda-time:2.10.13")
+	  implementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
 
-    implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
-      exclude group: "org.yaml", module: "snakeyaml"
-    }
-    implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion") {
-      exclude group: "commons-codec", module: "commons-codec"
-      exclude group: "org.apache.httpcomponents", module: "httpclient"
-    }
+    implementation ("joda-time:joda-time:2.10.13")
 
     implementation ("org.yaml:snakeyaml:1.30")
     implementation ("commons-codec:commons-codec:1.15")
@@ -181,8 +173,8 @@ subprojects {
 
     testImplementation ('junit:junit:4.13.2')
     testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
-	testImplementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
-	
+    testImplementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
+
     testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
 
     testImplementation ("org.mockito:mockito-core:$mockitoVersion")

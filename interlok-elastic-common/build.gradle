@@ -2,6 +2,7 @@ ext {
   componentName='Interlok Storage/Elastic: Common'
   componentDesc="Elasticsearch components that are not transport specific"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+  elasticVersion = '7.10.2'
 }
 
 dependencies {
@@ -11,6 +12,10 @@ dependencies {
   // a bigger deal to remove it out of elastic
   api("org.apache.commons:commons-csv:1.9.0")
   api("net.sf.supercsv:super-csv:2.4.0")
+
+  implementation ("org.elasticsearch:elasticsearch:$elasticVersion") {
+    exclude group: "org.yaml", module: "snakeyaml"
+  }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
