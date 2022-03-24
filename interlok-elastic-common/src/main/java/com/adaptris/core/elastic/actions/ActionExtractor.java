@@ -9,10 +9,10 @@ import com.adaptris.core.elastic.DocumentWrapper;
 public interface ActionExtractor {
   /**
    * Extract the action from the document or message.
-   * 
+   *
    * @param msg the associated message (for metadata)
    * @param document the {@link DocumentWrapper}.
    * @return the action that generally maps to {@link DocumentAction}.
    */
-  public String extract(AdaptrisMessage msg, DocumentWrapper document) throws ServiceException;
+  String extract(AdaptrisMessage msg, DocumentWrapper document) throws ServiceException;
 }

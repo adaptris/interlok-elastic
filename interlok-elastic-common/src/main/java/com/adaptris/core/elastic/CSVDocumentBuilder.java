@@ -24,6 +24,7 @@ import com.adaptris.core.elastic.csv.FormatBuilder;
 import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -56,6 +57,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  */
 @XStreamAlias("elastic-csv-document-builder")
 @ComponentProfile(summary = "Build documents for elasticsearch from a CSV document", since = "3.9.1")
+@NoArgsConstructor
 public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
 
   /**
@@ -68,21 +70,6 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   @Getter
   @Setter
   private Boolean useHeaderRecord;
-
-  public CSVDocumentBuilder() {
-    super();
-  }
-
-  @Deprecated
-  public CSVDocumentBuilder(FormatBuilder f) {
-    super();
-    setFormat(f);
-  }
-
-  public CSVDocumentBuilder(PreferenceBuilder p) {
-    super();
-    setPreference(p);
-  }
 
   public CSVDocumentBuilder withUseHeaderRecord(Boolean b) {
     setUseHeaderRecord(b);

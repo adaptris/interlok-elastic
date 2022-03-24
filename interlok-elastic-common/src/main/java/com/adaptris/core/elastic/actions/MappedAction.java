@@ -1,8 +1,5 @@
 package com.adaptris.core.elastic.actions;
 
-import javax.validation.constraints.NotNull;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.http.util.Args;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
@@ -10,15 +7,17 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.elastic.DocumentWrapper;
 import com.adaptris.util.KeyValuePairList;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Wraps a ActionExtractor implementation which is then mapped onto a different action.
- * 
+ *
  * @config elastic-mapped-action
- * 
+ *
  */
 @XStreamAlias("elastic-mapped-action")
 @ComponentProfile(
@@ -28,7 +27,7 @@ public class MappedAction implements ActionExtractor {
 
   /**
    * The underlying action extractor.
-   * 
+   *
    */
   @NotNull
   @InputFieldDefault(value = "INDEX")
