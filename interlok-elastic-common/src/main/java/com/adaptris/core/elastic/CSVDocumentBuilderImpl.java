@@ -232,7 +232,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   protected abstract CSVDocumentWrapper buildWrapper(CsvListReader reader, AdaptrisMessage message) throws Exception;
 
 
-  protected abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator {
+  protected static abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator<DocumentWrapper> {
     @Deprecated
     protected CSVParser parser;
     @Deprecated
@@ -267,10 +267,8 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void close() throws IOException {
-      IOUtils.closeQuietly(parser);
-      IOUtils.closeQuietly(reader);
+      IOUtils.closeQuietly(parser, reader);
     }
   }
 }

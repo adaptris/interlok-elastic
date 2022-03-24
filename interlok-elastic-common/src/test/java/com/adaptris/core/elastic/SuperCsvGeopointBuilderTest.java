@@ -1,5 +1,10 @@
 package com.adaptris.core.elastic;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.elastic.fields.ToUpperCaseFieldNameMapper;
@@ -8,16 +13,10 @@ import com.adaptris.csv.BasicPreferenceBuilder.Style;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
-import org.elasticsearch.common.Strings;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.LinkedHashMap;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.elasticsearch.common.Strings;
+import org.junit.Test;
 
 public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
 
@@ -57,8 +56,8 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
 
   @Override
   protected CSVWithGeoPointBuilder createBuilder() {
-    return new CSVWithGeoPointBuilder(new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE)).withLatitudeFieldNames("latitude,lat").withLongitudeFieldNames("longitude,lon")
-        .withLocationFieldName("location");
+    return new CSVWithGeoPointBuilder().withLatitudeFieldNames("latitude,lat").withLongitudeFieldNames("longitude,lon")
+        .withLocationFieldName("location").withPreferences(new BasicPreferenceBuilder(Style.STANDARD_PREFERENCE));
   }
 
   @Test
@@ -72,11 +71,11 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read(JSON_PRODUCTUNIQUEID));
         assertTrue(Math.abs((Long)context.read("$.My_Timestamp")-new Date().getTime())<50);
-        LinkedHashMap map = context.read(JSON_LOCATION);
+        LinkedHashMap<?,?> map = context.read(JSON_LOCATION);
         assertTrue(map.containsKey("lat"));
-        assertFalse("0".equals(map.get("lat").toString()));
+        assertNotEquals("0", map.get("lat").toString());
         assertTrue(map.containsKey("lon"));
-        assertFalse("0".equals(map.get("lon").toString()));
+        assertNotEquals("0", map.get("lon").toString());
       }
     }
     assertEquals(2, count);
@@ -92,11 +91,11 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         count++;
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read(JSON_PRODUCTUNIQUEID));
-        LinkedHashMap map = context.read(JSON_LOCATION);
+        LinkedHashMap<?,?> map = context.read(JSON_LOCATION);
         assertTrue(map.containsKey("lat"));
-        assertFalse("0".equals(map.get("lat").toString()));
+        assertNotEquals("0", map.get("lat").toString());
         assertTrue(map.containsKey("lon"));
-        assertFalse("0".equals(map.get("lon").toString()));
+        assertNotEquals("0", map.get("lon").toString());
       }
     }
     assertEquals(2, count);
@@ -113,11 +112,11 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         count++;
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read(JSON_PRODUCTUNIQUEID.toUpperCase()));
-        LinkedHashMap map = context.read(JSON_LOCATION.toUpperCase());
+        LinkedHashMap<?,?> map = context.read(JSON_LOCATION.toUpperCase());
         assertTrue(map.containsKey("lat"));
-        assertFalse("0".equals(map.get("lat").toString()));
+        assertNotEquals("0", map.get("lat").toString());
         assertTrue(map.containsKey("lon"));
-        assertFalse("0".equals(map.get("lon").toString()));
+        assertNotEquals("0", map.get("lon").toString());
       }
     }
     assertEquals(2, count);
@@ -137,11 +136,11 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         count++;
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read(JSON_PRODUCTUNIQUEID));
-        LinkedHashMap map = context.read("$.My_Location");
+        LinkedHashMap<?,?> map = context.read("$.My_Location");
         assertTrue(map.containsKey("lat"));
-        assertFalse("0".equals(map.get("lat").toString()));
+        assertNotEquals("0", map.get("lat").toString());
         assertTrue(map.containsKey("lon"));
-        assertFalse("0".equals(map.get("lon").toString()));
+        assertNotEquals("0", map.get("lon").toString());
       }
     }
     assertEquals(2, count);
@@ -157,11 +156,11 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         count++;
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read(JSON_PRODUCTUNIQUEID));
-        LinkedHashMap map = context.read(JSON_LOCATION);
+        LinkedHashMap<?,?> map = context.read(JSON_LOCATION);
         assertTrue(map.containsKey("lat"));
-        assertFalse("0".equals(map.get("lat").toString()));
+        assertNotEquals("0", map.get("lat").toString());
         assertTrue(map.containsKey("lon"));
-        assertFalse("0".equals(map.get("lon").toString()));
+        assertNotEquals("0", map.get("lon").toString());
       }
     }
     assertEquals(3, count);
@@ -178,10 +177,10 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read("$.productuniqueid"));
         try {
-          LinkedHashMap map = context.read(JSON_LOCATION);
+          context.read(JSON_LOCATION);
           fail();
         } catch (PathNotFoundException expected) {
-          ;
+
         }
       }
     }
@@ -199,10 +198,10 @@ public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("UID-" + count, context.read("$.productuniqueid"));
         try {
-          LinkedHashMap map = context.read(JSON_LOCATION);
+          context.read(JSON_LOCATION);
           fail();
         } catch (PathNotFoundException expected) {
-          ;
+
         }
       }
     }
