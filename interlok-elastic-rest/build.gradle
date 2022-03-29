@@ -3,7 +3,7 @@ ext {
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   elasticVersion = '7.15.1'
-  jacksonVersion = '2.13.2'
+  jacksonVersion = '2.13.2.20220324'
 }
 
 dependencies {
@@ -20,10 +20,12 @@ dependencies {
   api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
   implementation ("commons-codec:commons-codec:1.15")
   implementation ("org.apache.httpcomponents:httpclient:4.5.13")
-  implementation ("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-smile:$jacksonVersion")
-  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jacksonVersion")
-  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:$jacksonVersion")
+  // Dependency to platform/BOM
+  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  implementation ("com.fasterxml.jackson.core:jackson-databind")
+  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-smile")
+  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
