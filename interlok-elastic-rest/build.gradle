@@ -3,7 +3,7 @@ ext {
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   elasticVersion = '7.15.1'
-  jacksonVersion = '2.13.2.20220324'
+  jacksonVersion = '2.13.2.20220328'
 }
 
 dependencies {
