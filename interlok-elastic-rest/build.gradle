@@ -3,11 +3,13 @@ ext {
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   elasticVersion = '7.15.1'
-  jacksonVersion = '2.13.2.20220324'
+  jacksonVersion = '2.13.2.20220328'
 }
 
 dependencies {
   api project(':interlok-elastic-common')
+  api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
+  api ("com.adaptris:interlok-apache-http-async:$interlokCoreVersion") { changing= true}
   implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
     exclude group: "org.yaml", module: "snakeyaml"
     exclude group: "org.apache.logging.log4j", module:"log4j-api"
@@ -17,7 +19,6 @@ dependencies {
     exclude group: "org.apache.httpcomponents", module: "httpclient"
     exclude group: "org.apache.logging.log4j", module:"log4j-api"
   }
-  api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
   implementation ("commons-codec:commons-codec:1.15")
   implementation ("org.apache.httpcomponents:httpclient:4.5.13")
   // Dependency to platform/BOM
