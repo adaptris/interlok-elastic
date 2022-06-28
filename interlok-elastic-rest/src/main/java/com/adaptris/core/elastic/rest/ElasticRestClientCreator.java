@@ -1,16 +1,19 @@
 package com.adaptris.core.elastic.rest;
 
+import com.adaptris.core.CoreException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.NoArgsConstructor;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.sniff.Sniffer;
-import com.adaptris.core.CoreException;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.NoArgsConstructor;
 
+/** Default elastic client behaviour.
+ *
+ */
 @XStreamAlias("default-elastic-rest-client")
 @NoArgsConstructor
 public class ElasticRestClientCreator implements ElasticClientCreator {

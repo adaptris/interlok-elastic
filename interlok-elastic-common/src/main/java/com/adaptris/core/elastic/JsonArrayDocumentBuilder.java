@@ -212,7 +212,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void close() throws IOException {
       IOUtils.closeQuietly(jsonIterable);
     }

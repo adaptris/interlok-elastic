@@ -16,13 +16,19 @@
 
 package com.adaptris.core.elastic;
 
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.elastic.csv.FormatBuilder;
-import com.adaptris.csv.PreferenceBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,15 +39,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.supercsv.io.CsvListReader;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Builds a document for elastic search.
@@ -105,17 +102,6 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     super();
   }
 
-  @Deprecated
-  public CSVWithGeoPointBuilder(FormatBuilder f) {
-    super();
-    setFormat(f);
-  }
-
-  public CSVWithGeoPointBuilder(PreferenceBuilder p) {
-    super();
-    setPreference(p);
-  }
-
   public CSVWithGeoPointBuilder withLatitudeFieldNames(String s) {
     setLatitudeFieldNames(s);
     return this;
@@ -146,15 +132,15 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   @Override
   @Deprecated
   protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
-    Set<String> latitudeFieldNames = new HashSet<String>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
-    Set<String> longitudeFieldNames = new HashSet<String>(Arrays.asList(longitudeFieldNames().toLowerCase().split(",")));
+    Set<String> latitudeFieldNames = new HashSet<>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
+    Set<String> longitudeFieldNames = new HashSet<>(Arrays.asList(longitudeFieldNames().toLowerCase().split(",")));
     return new ApacheWrapper(latitudeFieldNames, longitudeFieldNames, parser);
   }
 
   @Override
   protected CSVDocumentWrapper buildWrapper(CsvListReader reader, AdaptrisMessage message) throws Exception {
-    Set<String> latitudeFieldNames = new HashSet<String>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
-    Set<String> longitudeFieldNames = new HashSet<String>(Arrays.asList(longitudeFieldNames().toLowerCase().split(",")));
+    Set<String> latitudeFieldNames = new HashSet<>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
+    Set<String> longitudeFieldNames = new HashSet<>(Arrays.asList(longitudeFieldNames().toLowerCase().split(",")));
     return new SuperWrapper(latitudeFieldNames, longitudeFieldNames, reader);
   }
 
@@ -265,6 +251,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private class LatLongHandler {
 
     private final Set<String> latOrLongFieldNames;

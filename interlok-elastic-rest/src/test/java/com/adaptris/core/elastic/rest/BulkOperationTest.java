@@ -168,7 +168,7 @@ public class BulkOperationTest extends ExampleProducerCase {
 
   private BulkOperation createProducerForTests(String action) {
     BulkOperation producer = new BulkOperation().withAction(new ConfiguredAction().withAction(action))
-        .withDocumentBuilder(new CSVDocumentBuilder(new BasicPreferenceBuilder()).withUseHeaderRecord(true))
+        .withDocumentBuilder(new CSVDocumentBuilder().withUseHeaderRecord(true).withPreferences(new BasicPreferenceBuilder()))
         .withRefreshPolicy(null)
             .withIndex("myIndex");
     return producer;

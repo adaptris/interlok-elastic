@@ -2,12 +2,31 @@ ext {
   componentName='Interlok Storage/Elastic: REST Client'
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
+  elasticVersion = '7.15.1'
+  jacksonVersion = '2.13.3'
 }
 
 dependencies {
   api project(':interlok-elastic-common')
   api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
-
+  api ("com.adaptris:interlok-apache-http-async:$interlokCoreVersion") { changing= true}
+  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
+    exclude group: "org.yaml", module: "snakeyaml"
+    exclude group: "org.apache.logging.log4j", module:"log4j-api"
+  }
+  implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion") {
+    exclude group: "commons-codec", module: "commons-codec"
+    exclude group: "org.apache.httpcomponents", module: "httpclient"
+    exclude group: "org.apache.logging.log4j", module:"log4j-api"
+  }
+  implementation ("commons-codec:commons-codec:1.15")
+  implementation ("org.apache.httpcomponents:httpclient:4.5.13")
+  // Dependency to platform/BOM
+  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  implementation ("com.fasterxml.jackson.core:jackson-databind")
+  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-smile")
+  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+  implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -44,25 +63,25 @@ jar {
 
 publishing {
   publications {
-      mavenJava(MavenPublication) {
-          from components.java
+    mavenJava(MavenPublication) {
+      from components.java
 
-          artifact javadocJar { classifier "javadoc" }
-          artifact sourcesJar { classifier "sources" }
-          artifact examplesJar { classifier "examples" }
-          pom.withXml {
-            asNode().appendNode("name", componentName)
-            asNode().appendNode("description", componentDesc)
-			asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
-            def properties = asNode().appendNode("properties")
-            properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
-            properties.appendNode("target", "3.9.1+")
-            properties.appendNode("license", "false")
-            properties.appendNode("tags", "elastic,elasticsearch")
-            properties.appendNode("readme", "https://github.com/adaptris/interlok-elastic/raw/develop/README.md")
-            properties.appendNode("repository", "https://github.com/adaptris/interlok-elastic")
-          }
+      artifact javadocJar { classifier "javadoc" }
+      artifact sourcesJar { classifier "sources" }
+      artifact examplesJar { classifier "examples" }
+      pom.withXml {
+        asNode().appendNode("name", componentName)
+        asNode().appendNode("description", componentDesc)
+        asNode().appendNode("url", "https://interlok.adaptris.net/interlok-docs/#/")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
+        properties.appendNode("target", "3.9.1+")
+        properties.appendNode("license", "false")
+        properties.appendNode("tags", "elastic,elasticsearch")
+        properties.appendNode("readme", "https://github.com/adaptris/interlok-elastic/raw/develop/README.md")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-elastic")
       }
+    }
   }
   repositories {
     maven {

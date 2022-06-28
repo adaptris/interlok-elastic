@@ -4,9 +4,9 @@ package com.adaptris.core.elastic.fields;
 public interface FieldNameMapper {
   /**
    * Map the fieldname into something else.
-   * 
+   *
    * @param name the name from the document
    * @return the field name.
    */
-  public String map(String name); 
+  String map(String name);
 }

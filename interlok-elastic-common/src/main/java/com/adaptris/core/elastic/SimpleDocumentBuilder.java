@@ -1,12 +1,12 @@
 /*
  * Copyright Adaptris Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,26 +17,25 @@
 package com.adaptris.core.elastic;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 
 /**
  * Builds a simple document for elastic search.
- * 
+ *
  * <p>
  * The simple document that is created contains the following characteristics
  * <ul>
@@ -46,16 +45,15 @@ import lombok.extern.slf4j.Slf4j;
  * <li>The message's uniqueID is used as the ID of the document.
  * </ul>
  * </p>
- * 
+ *
  * @config elastic-simple-document-builder
  *
  */
 @XStreamAlias("elastic-simple-document-builder")
 @ComponentProfile(summary = "Build a document for elasticsearch using the raw payload and metadata", since = "3.9.1")
 @NoArgsConstructor
+@Slf4j
 public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
-
-  private transient Logger log = LoggerFactory.getLogger(this.getClass());
 
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
@@ -77,9 +75,7 @@ public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
 
   private static Map<String, String> filterIllegal(Map<String, String> map) {
     Map<String, String> result = new HashMap<>();
-    map.entrySet().stream().filter(e -> !e.getKey().contains(".")).forEach(e -> {
-      result.put(e.getKey(), e.getValue());
-    });
+    map.entrySet().stream().filter(e -> !e.getKey().contains(".")).forEach(e -> result.put(e.getKey(), e.getValue()));
     return result;
   }
 }
