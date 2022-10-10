@@ -1,26 +1,10 @@
-/*
-    Copyright Adaptris Ltd.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-*/
-
-package com.adaptris.core.elastic.rest;
+package com.adaptris.core.elastic.sdk.producer;
 
 import javax.validation.constraints.Min;
+
 import org.apache.commons.lang3.ObjectUtils;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.xcontent.XContentBuilder;
+
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
@@ -30,10 +14,17 @@ import com.adaptris.core.ProduceException;
 import com.adaptris.core.elastic.DocumentAction;
 import com.adaptris.core.elastic.DocumentWrapper;
 import com.adaptris.core.elastic.actions.ActionExtractor;
+import com.adaptris.core.elastic.sdk.connection.ElasticConnection;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.adaptris.util.NumberUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Refresh;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.util.MissingRequiredPropertyException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,19 +46,19 @@ import lombok.Setter;
  * the messages.
  * </p>
  *
- * @config elastic-rest-bulk-operation
+ * @config elastic-sdk-bulk-operation
  *
  */
-@XStreamAlias("elastic-rest-bulk-operation")
+@XStreamAlias("elastic-sdk-bulk-operation")
 @AdapterComponent
-@ComponentProfile(summary = "Use the REST API to interact with Elasticsearch", tag = "producer,elastic,bulk,batch",
-    recommended = {ElasticRestConnection.class})
+@ComponentProfile(summary = "Use the Elastic SDK to interact with Elasticsearch", tag = "producer,elastic,bulk,batch",
+    recommended = {ElasticConnection.class})
 @DisplayOrder(order =
 {
     "index", "batchWindow", "documentBuilder", "action", "refreshPolicy"
 })
 @NoArgsConstructor
-public class BulkOperation extends SingleOperation {
+public class ElasticSdkBulkProducer extends ElasticSdkProducer {
 
   private static final int DEFAULT_BATCH_WINDOW = 10000;
   /**
@@ -84,11 +75,13 @@ public class BulkOperation extends SingleOperation {
   private Integer batchWindow;
 
   @Override
-  protected AdaptrisMessage doRequest(AdaptrisMessage msg, final String index, long timeout)
-      throws ProduceException {
+  protected AdaptrisMessage doRequest(AdaptrisMessage msg, final String index, long timeout) throws ProduceException {
     try {
-      TransportClient client = retrieveConnection(TransportClientProvider.class).getTransport();
-      BulkRequest bulkRequest = requestBuilder.buildBulkRequest().setRefreshPolicy(getRefreshPolicy());
+      ElasticsearchClient client = retrieveConnection(ElasticConnection.class).getClient();
+      
+      BulkRequest.Builder bulkRequest = new BulkRequest.Builder();
+      BulkRequest finalBulkRequest = null;
+      
       long total = 0;
       try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(getDocumentBuilder().build(msg))) {
         int count = 0;
@@ -99,29 +92,36 @@ public class BulkOperation extends SingleOperation {
               ObjectUtils.defaultIfNull(doc.action(), DocumentAction.valueOf(actionExtractor().extract(msg, doc)));
           switch (action) {
             case INDEX:
-              bulkRequest.add(requestBuilder.buildIndexRequest(index, doc, null));
+              requestBuilder.buildBulkIndexRequest(bulkRequest, index, doc, null, client, msg.getContentEncoding());
               break;
             case UPDATE:
-              bulkRequest.add(requestBuilder.buildUpdateRequest(index, doc, null));
+              requestBuilder.buildBulkUpdateRequest(bulkRequest, index, doc, null, client, msg.getContentEncoding());
               break;
             case DELETE:
-              bulkRequest.add(requestBuilder.buildDeleteRequest(index, doc, null));
+              requestBuilder.buildBulkDeleteRequest(bulkRequest, index, doc, null);
               break;
             case UPSERT:
-              bulkRequest.add(requestBuilder.buildUpsertRequest(index, doc, null));
+              requestBuilder.buildBulkIndexRequest(bulkRequest, index, doc, null, client, msg.getContentEncoding());
               break;
             default:
               throw new ProduceException("Unsupported action: " + action);
           }
+          
           if (count >= batchWindow()) {
-            doSend(bulkRequest, client);
+            doSend(bulkRequest.build(), client);
             count = 0;
-            bulkRequest = requestBuilder.buildBulkRequest().setRefreshPolicy(getRefreshPolicy());
+            bulkRequest = new BulkRequest.Builder();
+            bulkRequest.refresh(getRefreshPolicy() == null ? null : Refresh.valueOf(getRefreshPolicy()));
           }
         }
       }
-      if (bulkRequest.numberOfActions() > 0) {
-        doSend(bulkRequest, client);
+      try {
+        finalBulkRequest = bulkRequest.build();
+        if (finalBulkRequest.operations().size() > 0) {
+          doSend(finalBulkRequest, client);
+        }
+      } catch (MissingRequiredPropertyException ex) {
+        log.trace("No more operations to send to elastic.");
       }
       log.trace("Produced a total of {} documents", total);
     }
@@ -131,17 +131,17 @@ public class BulkOperation extends SingleOperation {
     return msg;
   }
 
-  private void doSend(BulkRequest request, TransportClient client) throws Exception {
-    int count = request.numberOfActions();
+  private void doSend(BulkRequest request, ElasticsearchClient client) throws Exception {
+    int count = request.operations().size();
     BulkResponse response = client.bulk(request);
-    if (response.hasFailures()) {
-      throw new ProduceException(response.buildFailureMessage());
+    if (response.errors()) {
+      throw new ProduceException(response.toString());
     }
-    log.trace("Producing batch of {} requests took {}", count, response.getTook().toString());
+    log.trace("Producing batch of {} requests took {}", count, response.took());
     return;
   }
 
-  public BulkOperation withBatchWindow(Integer i) {
+  public ElasticSdkBulkProducer withBatchWindow(Integer i) {
     setBatchWindow(i);
     return this;
   }
@@ -149,5 +149,5 @@ public class BulkOperation extends SingleOperation {
   private int batchWindow() {
     return NumberUtils.toIntDefaultIfNull(getBatchWindow(), DEFAULT_BATCH_WINDOW);
   }
-
+  
 }

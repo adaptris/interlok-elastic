@@ -16,28 +16,28 @@
 
 package com.adaptris.core.elastic;
 
-import com.adaptris.annotation.AdvancedConfig;
-import com.adaptris.annotation.ComponentProfile;
-import com.adaptris.annotation.InputFieldDefault;
-import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.elastic.csv.FormatBuilder;
-import com.adaptris.csv.PreferenceBuilder;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.BooleanUtils;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.supercsv.io.CsvListReader;
+import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.BooleanUtils;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.supercsv.io.CsvListReader;
+
+import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.InputFieldDefault;
+import com.adaptris.core.AdaptrisMessage;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Builds a simple document for elastic search.

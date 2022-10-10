@@ -2,7 +2,7 @@ ext {
   componentName='Interlok Storage/Elastic: Common'
   componentDesc="Elasticsearch components that are not transport specific"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  elasticVersion = '7.15.1'
+  elasticVersion = '7.17.6'
   jacksonVersion = '2.13.4'
 }
 
@@ -18,6 +18,8 @@ dependencies {
     exclude group: "org.yaml", module: "snakeyaml"
     exclude group: "org.apache.logging.log4j", module:"log4j-api"
   }
+  implementation ("org.apache.lucene:lucene-core:8.11.1")
+  implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   implementation ("com.fasterxml.jackson.core:jackson-databind")
