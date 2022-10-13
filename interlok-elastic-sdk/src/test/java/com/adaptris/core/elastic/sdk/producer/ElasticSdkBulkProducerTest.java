@@ -96,7 +96,7 @@ public class ElasticSdkBulkProducerTest {
   
   @Test
   public void testBatchWindowIndexDocument() throws Exception {
-    producer.withBatchWindow(1);
+    producer.withBatchWindow("1");
     producer.produce(message);
     
     verify(mockClient, times(3)).bulk(any(BulkRequest.class));

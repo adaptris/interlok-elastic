@@ -7,14 +7,20 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.interlok.resolver.ExternalResolver;
 import com.adaptris.security.exc.PasswordException;
 import com.adaptris.security.password.Password;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import lombok.Getter;
 import lombok.Setter;
 
+@XStreamAlias("elastic-sdk-basic-authentication")
+@AdapterComponent
+@ComponentProfile(summary = "Username/Password authentication method to connect to Elasticsearch.", tag = "auth,elastic,basic")
 public class ElasticBasicAuthenticator extends ElasticAuthenticator {
   
   @Getter

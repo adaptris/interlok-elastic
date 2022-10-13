@@ -6,14 +6,20 @@ import java.util.Base64;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.interlok.resolver.ExternalResolver;
 import com.adaptris.security.exc.PasswordException;
 import com.adaptris.security.password.Password;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import lombok.Getter;
 import lombok.Setter;
 
+@XStreamAlias("elastic-sdk-apikey-authentication")
+@AdapterComponent
+@ComponentProfile(summary = "Use an API key as your authentication method to connect to Elasticsearch.", tag = "auth,elastic,api,apikey")
 public class ElasticApiKeyAuthenticator extends ElasticAuthenticator {
 
   @Getter

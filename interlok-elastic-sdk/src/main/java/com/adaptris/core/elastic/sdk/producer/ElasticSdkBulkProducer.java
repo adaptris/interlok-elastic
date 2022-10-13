@@ -3,6 +3,7 @@ package com.adaptris.core.elastic.sdk.producer;
 import javax.validation.constraints.Min;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.xcontent.XContentBuilder;
 
 import com.adaptris.annotation.AdapterComponent;
@@ -17,7 +18,6 @@ import com.adaptris.core.elastic.actions.ActionExtractor;
 import com.adaptris.core.elastic.sdk.connection.ElasticConnection;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.interlok.util.CloseableIterable;
-import com.adaptris.util.NumberUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -60,7 +60,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ElasticSdkBulkProducer extends ElasticSdkProducer {
 
-  private static final int DEFAULT_BATCH_WINDOW = 10000;
+  private static final String DEFAULT_BATCH_WINDOW = "10000";
   /**
    * The batch window which is the number of operations that make a bulk request before its
    * executed.
@@ -72,7 +72,7 @@ public class ElasticSdkBulkProducer extends ElasticSdkProducer {
   @InputFieldDefault(value = "10000")
   @Getter
   @Setter
-  private Integer batchWindow;
+  private String batchWindow;
 
   @Override
   protected AdaptrisMessage doRequest(AdaptrisMessage msg, final String index, long timeout) throws ProduceException {
@@ -107,7 +107,7 @@ public class ElasticSdkBulkProducer extends ElasticSdkProducer {
               throw new ProduceException("Unsupported action: " + action);
           }
           
-          if (count >= batchWindow()) {
+          if (count >= batchWindow(msg)) {
             doSend(bulkRequest.build(), client);
             count = 0;
             bulkRequest = new BulkRequest.Builder();
@@ -141,13 +141,13 @@ public class ElasticSdkBulkProducer extends ElasticSdkProducer {
     return;
   }
 
-  public ElasticSdkBulkProducer withBatchWindow(Integer i) {
+  public ElasticSdkBulkProducer withBatchWindow(String i) {
     setBatchWindow(i);
     return this;
   }
 
-  private int batchWindow() {
-    return NumberUtils.toIntDefaultIfNull(getBatchWindow(), DEFAULT_BATCH_WINDOW);
+  private int batchWindow(AdaptrisMessage message) {
+    return Integer.parseInt(message.resolve(StringUtils.defaultIfBlank(getBatchWindow(), DEFAULT_BATCH_WINDOW)));
   }
   
 }

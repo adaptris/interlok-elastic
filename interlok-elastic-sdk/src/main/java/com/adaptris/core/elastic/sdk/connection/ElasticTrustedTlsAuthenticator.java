@@ -16,7 +16,10 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldHint;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +31,9 @@ import lombok.Setter;
  * @author Aaron
  *
  */
+@XStreamAlias("elastic-sdk-trustedtls-authentication")
+@AdapterComponent
+@ComponentProfile(summary = "Always trust TLS authentication method to connect to Elasticsearch.", tag = "auth,elastic,tls,trusted")
 public class ElasticTrustedTlsAuthenticator extends ElasticAuthenticator {
   
   @Getter

@@ -21,7 +21,7 @@ import co.elastic.clients.json.JsonData;
 import co.elastic.clients.json.JsonpMapper;
 import jakarta.json.spi.JsonProvider;
 
-@XStreamAlias("elastic-request-builder")
+@XStreamAlias("elastic-sdk-request-builder")
 public class ElasticSdkRequestBuilder {
   
   protected transient Logger log = LoggerFactory.getLogger(this.getClass().getName());
