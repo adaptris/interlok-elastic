@@ -16,7 +16,7 @@
 
 package com.adaptris.core.elastic;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentBuilder;
 import lombok.NonNull;
 import lombok.Setter;
 
