@@ -1,6 +1,6 @@
 ext {
-  componentName='Interlok Storage/Elastic: REST Client'
-  componentDesc="Producing to Elasticsearch using their REST api"
+  componentName='Interlok Storage/Elastic: SDK Client'
+  componentDesc="Producing to Elasticsearch using their SDK"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   elasticVersion = '7.17.6'
   jacksonVersion = '2.13.4.20221013'
@@ -10,19 +10,11 @@ dependencies {
   api project(':interlok-elastic-common')
   api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
   api ("com.adaptris:interlok-apache-http-async:$interlokCoreVersion") { changing= true}
-  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
-    exclude group: "org.yaml", module: "snakeyaml"
-    exclude group: "org.apache.logging.log4j", module:"log4j-api"
-  }
-  implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion") {
-    exclude group: "commons-codec", module: "commons-codec"
-    exclude group: "org.apache.httpcomponents", module: "httpclient"
-    exclude group: "org.apache.logging.log4j", module:"log4j-api"
-  }
-  implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
   
-  implementation ("commons-codec:commons-codec:1.15")
-  implementation ("org.apache.httpcomponents:httpclient:4.5.13")
+  implementation ("co.elastic.clients:elasticsearch-java:$elasticVersion")
+  implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
+  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion")
+  
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   implementation ("com.fasterxml.jackson.core:jackson-databind")

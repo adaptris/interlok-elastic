@@ -19,7 +19,7 @@ package com.adaptris.core.elastic;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentBuilder;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.InputFieldHint;
