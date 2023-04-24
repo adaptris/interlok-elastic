@@ -3,7 +3,7 @@ ext {
   componentDesc="Elasticsearch components that are not transport specific"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
   elasticVersion = '7.17.6'
-  jacksonVersion = '2.14.2'
+  jacksonVersion = '2.15.0'
 }
 
 dependencies {
