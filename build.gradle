@@ -3,13 +3,13 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
   id 'nebula.optional-base' version '7.0.0'  apply false
   id "io.freefair.lombok" version "6.5.1" apply false
-  id 'com.github.spotbugs' version '5.0.13' apply false
-  id 'org.owasp.dependencycheck' version '7.4.4' apply false
+  id 'com.github.spotbugs' version '5.0.14' apply false
+  id 'org.owasp.dependencycheck' version '8.2.1' apply false
 }
 
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.7-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.7-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.8-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.8-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -144,7 +144,7 @@ subprojects {
     api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
     implementation ("org.yaml:snakeyaml:1.33")
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation ("com.jayway.jsonpath:json-path:2.7.0")
+    implementation ("com.jayway.jsonpath:json-path:2.8.0")
     implementation ("commons-collections:commons-collections:3.2.2")
     implementation ("joda-time:joda-time:2.12.0")
     implementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
@@ -256,6 +256,7 @@ subprojects {
     failBuildOnCVSS = 7.0
     analyzers {
       assemblyEnabled=false
+      knownExploitedURL=project.findProperty('dependencyCheckKnownExploitedURL')
     }
   }
 
