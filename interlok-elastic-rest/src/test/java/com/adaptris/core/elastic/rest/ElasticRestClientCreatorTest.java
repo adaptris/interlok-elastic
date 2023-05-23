@@ -1,15 +1,15 @@
 package com.adaptris.core.elastic.rest;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ElasticRestClientCreatorTest {
 
-  @SuppressWarnings("deprecation")
   @Test
   public void testCreate() throws Exception {
     ElasticRestClientCreator creator = new ElasticRestClientCreator();
@@ -21,4 +21,5 @@ public class ElasticRestClientCreatorTest {
   protected static List<String> getTransportUrls() {
     return Arrays.asList("http://localhost:9200", "localhost:9201", "https://localhost:9202");
   }
+
 }

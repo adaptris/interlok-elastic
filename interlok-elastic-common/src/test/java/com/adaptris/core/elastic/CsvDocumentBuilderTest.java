@@ -1,7 +1,7 @@
 package com.adaptris.core.elastic;
 
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.elastic.csv.BasicFormatBuilder;
@@ -21,7 +21,7 @@ public class CsvDocumentBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_NoHeaders() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    msg.addMetadata(getName(), getName());
     CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false);
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {

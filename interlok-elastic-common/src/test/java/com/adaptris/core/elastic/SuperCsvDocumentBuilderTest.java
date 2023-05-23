@@ -10,14 +10,14 @@ import com.adaptris.csv.BasicPreferenceBuilder.Style;
 import com.adaptris.interlok.util.CloseableIterable;
 import com.jayway.jsonpath.ReadContext;
 import org.elasticsearch.common.Strings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
 
@@ -30,7 +30,7 @@ public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
   @Test
   public void testBuild_NoHeaders() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    msg.addMetadata(getName(), getName());
     CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false);
     int count = 0;
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
@@ -45,7 +45,7 @@ public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
   @Test
   public void testInvalidArgumentsNone() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    msg.addMetadata(getName(), getName());
     CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false).withPreferences(null).withFormat(null);
 
     try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
@@ -58,7 +58,7 @@ public class SuperCsvDocumentBuilderTest extends CsvBuilderCase {
   @Test
   public void testInvalidArgumentsTooMany() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_INPUT);
-    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    msg.addMetadata(getName(), getName());
     CSVDocumentBuilder documentBuilder = createBuilder().withUseHeaderRecord(false).withFormat(new BasicFormatBuilder());
 
     int count = 0;

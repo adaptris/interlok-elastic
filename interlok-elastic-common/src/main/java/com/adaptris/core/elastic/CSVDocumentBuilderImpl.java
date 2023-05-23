@@ -82,8 +82,8 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
    * </p>
    */
   @AutoPopulated
-//  @NotNull
-//  @NonNull
+  // @NotNull
+  // @NonNull
   @Valid
   @Getter
   @Setter
@@ -188,7 +188,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     return result;
   }
 
-  protected String[] buildHeaders(CsvListReader mapReader)  {
+  protected String[] buildHeaders(CsvListReader mapReader) {
     try {
       return mapReader.getHeader(true);
     } catch (IOException e) {
@@ -222,8 +222,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
         CsvListReader reader = new CsvListReader(msg.getReader(), preference);
         result = buildWrapper(reader, msg);
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
     }
     return result;
@@ -233,7 +232,6 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   protected abstract CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception;
 
   protected abstract CSVDocumentWrapper buildWrapper(CsvListReader reader, AdaptrisMessage message) throws Exception;
-
 
   protected static abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator<DocumentWrapper> {
     @Deprecated
@@ -274,4 +272,5 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
       IOUtils.closeQuietly(parser, reader);
     }
   }
+
 }

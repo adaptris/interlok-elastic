@@ -1,7 +1,9 @@
 package com.adaptris.core.elastic.rest;
 
 import java.util.concurrent.TimeUnit;
+
 import javax.validation.constraints.NotBlank;
+
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
@@ -10,6 +12,7 @@ import com.adaptris.core.RequestReplyProducerImp;
 import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.interlok.util.Args;
 import com.adaptris.util.TimeInterval;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,9 +35,6 @@ public abstract class ElasticRestProducer extends RequestReplyProducerImp {
   @Setter
   @NotBlank
   private String index;
-
-  private transient boolean destWarning;
-
 
   @Override
   public void prepare() throws CoreException {

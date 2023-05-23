@@ -15,6 +15,7 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.sniff.Sniffer;
+
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -24,7 +25,6 @@ public class TransportClient implements Closeable {
   private transient Sniffer sniffer;
 
   @Override
-  @SuppressWarnings("deprecation")
   public void close() {
     IOUtils.closeQuietly(sniffer());
     IOUtils.closeQuietly(restClient());
@@ -53,4 +53,5 @@ public class TransportClient implements Closeable {
   public DeleteResponse delete(DeleteRequest request) throws IOException {
     return restClient().delete(request, RequestOptions.DEFAULT);
   }
+
 }
