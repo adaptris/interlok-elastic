@@ -25,7 +25,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.3'
   log4jVersion = '2.19.0'
-  junitJupiterVersion = '5.9.1'
+  junitJupiterVersion = '5.9.3'
   mockitoVersion = '4.9.0'
 }
 
@@ -93,8 +93,8 @@ subprojects {
   apply plugin: 'org.owasp.dependencycheck'
   apply plugin: "io.freefair.lombok"
 
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
@@ -150,18 +150,7 @@ subprojects {
     implementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
     testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitJupiterVersion") {
-      because 'allows JUnit 3 and JUnit 4 tests to run'
-    }
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1") {
-      because 'allows tests to run from IDEs that bundle older version of launcher'
-    }
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
-
-    testImplementation ('junit:junit:4.13.2')
+    testImplementation ("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
     testImplementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
     testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }

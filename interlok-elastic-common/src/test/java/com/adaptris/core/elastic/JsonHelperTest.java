@@ -1,14 +1,12 @@
 package com.adaptris.core.elastic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.EnumSet;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 
 import com.adaptris.core.CoreException;
 import com.jayway.jsonpath.Configuration;
@@ -20,11 +18,7 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 
 public class JsonHelperTest extends JsonHelper {
 
-  private static final String JSON_OBJECT =
-      "{\"author\":\"J. R. R. Tolkien\",\"price\":22.99,\"isbn\":\"0-395-19395-8\",\"category\":\"fiction\",\"title\":\"The Lord of the Rings\"}";
-
-  @Rule
-  public TestName testName = new TestName();
+  private static final String JSON_OBJECT = "{\"author\":\"J. R. R. Tolkien\",\"price\":22.99,\"isbn\":\"0-395-19395-8\",\"category\":\"fiction\",\"title\":\"The Lord of the Rings\"}";
 
   private Configuration jsonConfig = new Configuration.ConfigurationBuilder().jsonProvider(new JsonSmartJsonProvider())
       .mappingProvider(new JacksonMappingProvider()).options(EnumSet.noneOf(Option.class)).build();
@@ -52,4 +46,5 @@ public class JsonHelperTest extends JsonHelper {
     assertNotNull(wrapAsRuntimeException(new RuntimeException()));
     assertNotNull(wrapAsRuntimeException(new CoreException()));
   }
+
 }

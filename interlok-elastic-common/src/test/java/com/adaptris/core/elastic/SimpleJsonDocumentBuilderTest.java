@@ -1,12 +1,16 @@
 package com.adaptris.core.elastic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+
 import org.elasticsearch.common.Strings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
@@ -17,11 +21,10 @@ import com.jayway.jsonpath.ReadContext;
 
 public class SimpleJsonDocumentBuilderTest extends BuilderCase {
 
-
   @Test
   public void testBuild() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("Hello World");
-    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    msg.addMetadata(getName(), getName());
     msg.addMetadata("hello.world", "should.be.filtered");
     SimpleDocumentBuilder documentBuilder = new SimpleDocumentBuilder();
     int count = 0;
@@ -31,21 +34,23 @@ public class SimpleJsonDocumentBuilderTest extends BuilderCase {
         assertEquals(msg.getUniqueId(), doc.uniqueId());
         ReadContext context = parse(Strings.toString(doc.content()));
         assertEquals("Hello World", context.read("$.content"));
-        LinkedHashMap metadata = context.read("$.metadata");
-        assertTrue(metadata.containsKey(testName.getMethodName()));
+        LinkedHashMap<?, ?> metadata = context.read("$.metadata");
+        assertTrue(metadata.containsKey(getName()));
         assertFalse(metadata.containsKey("hello.world"));
-        assertEquals(testName.getMethodName(), metadata.get(testName.getMethodName()));
+        assertEquals(getName(), metadata.get(getName()));
       }
     }
     assertEquals(1, count);
   }
 
-  @Test(expected = ProduceException.class)
+  @Test
   public void testBuild_ProduceException() throws Exception {
     AdaptrisMessage msg = new DefectiveMessageFactory(EnumSet.of(WhenToBreak.METADATA_GET)).newMessage("Hello World");
-    msg.addMetadata(testName.getMethodName(), testName.getMethodName());
+    msg.addMetadata(getName(), getName());
     SimpleDocumentBuilder documentBuilder = new SimpleDocumentBuilder();
-    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
-    }
+    assertThrows(ProduceException.class, () -> {
+      try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
+      }
+    });
   }
 }
