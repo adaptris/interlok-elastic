@@ -29,14 +29,18 @@ ext {
   mockitoVersion = '5.2.0'
 }
 
+// If graphviz is installed via scoop, plantuml doesn't find it because it's not
+// in its expected "location(s)" it searches for c:\*\graphviz**\dot.exe
+// so windows we'd expect to have the GRAPHVIZ_DOT env defined 
+// On Linux we should be able to find it via the path.
 ext.hasGraphViz = { ->
-//  def app = "dot"
-//  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//    app = app + ".exe"
-//  }
-//  return System.getenv("PATH").split(File.pathSeparator).any{
-//    java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
-//  }
+  def app = "dot"
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    app = app + ".exe"
+  }
+  return System.getenv("GRAPHVIZ_DOT") !=null ||  System.getenv("PATH").split(File.pathSeparator).any{
+    java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
+  }
 }
 
 ext.gitBranchNameOrTimestamp = { branchName ->
@@ -61,7 +65,7 @@ ext.buildInfo = { ->
 if (JavaVersion.current().isJava8Compatible()) {
   allprojects {
     tasks.withType(Javadoc) {
-      options.addStringOption('Xdoclint:none', '-quiet')
+      options.addStringOption "Xdoclint:none", "-quiet"
     }
   }
 }
@@ -170,7 +174,7 @@ subprojects {
       options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
       taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
       options.addStringOption "tagletpath", configurations.javadoc.asPath
-      options.addStringOption('Xdoclint:none', '-quiet')
+      options.addStringOption "Xdoclint:none", "-quiet"
 
     }
   }
