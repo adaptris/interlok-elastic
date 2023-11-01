@@ -1,10 +1,12 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-  id 'nebula.optional-base' version '7.0.0'  apply false
+  // Manage optional dependencies in maven pom.
+  id "nebula.optional-base" version "7.0.0"  apply false
+  id "com.github.spotbugs" version "5.2.1" apply false
+  id "org.sonarqube" version "4.4.1.3373"
+  id "org.owasp.dependencycheck" version "8.4.2" apply false
   id "io.freefair.lombok" version "8.4" apply false
-  id 'com.github.spotbugs' version '5.2.1' apply false
-  id 'org.owasp.dependencycheck' version '8.4.2' apply false
 }
 
 ext {
@@ -62,16 +64,16 @@ ext.buildInfo = { ->
     }
 }
 
-if (JavaVersion.current().isJava8Compatible()) {
-  allprojects {
-    tasks.withType(Javadoc) {
-      options.addStringOption "Xdoclint:none", "-quiet"
-    }
-  }
-}
-
 task clean(type: Delete) {
   delete project.buildDir
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "adaptris_interlok-elastic"
+    property "sonar.organization", "adaptris-org"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 allprojects {
@@ -89,12 +91,13 @@ allprojects {
 }
 
 subprojects {
-  apply plugin: 'java-library'
-  apply plugin: 'maven-publish'
-  apply plugin: 'jacoco'
+  apply plugin: "java-library"
+  apply plugin: "maven-publish"
+  apply plugin: "jacoco"
   apply plugin: "nebula.optional-base"
-  apply plugin: 'com.github.spotbugs'
-  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: "com.github.spotbugs"
+  apply plugin: "org.sonarqube"
+  apply plugin: "org.owasp.dependencycheck"
   apply plugin: "io.freefair.lombok"
 
   sourceCompatibility = JavaVersion.VERSION_17
@@ -175,7 +178,6 @@ subprojects {
       taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
       options.addStringOption "tagletpath", configurations.javadoc.asPath
       options.addStringOption "Xdoclint:none", "-quiet"
-
     }
   }
 
