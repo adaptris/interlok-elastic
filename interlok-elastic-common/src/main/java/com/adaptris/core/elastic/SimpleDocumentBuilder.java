@@ -18,20 +18,22 @@ package com.adaptris.core.elastic;
 
 import static org.elasticsearch.xcontent.XContentFactory.jsonBuilder;
 
-import com.adaptris.annotation.ComponentProfile;
-import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.ProduceException;
-import com.adaptris.core.util.ExceptionHelper;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.xcontent.XContentBuilder;
+
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.ProduceException;
+import com.adaptris.core.util.ExceptionHelper;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import lombok.NoArgsConstructor;
 
 /**
  * Builds a simple document for elastic search.
@@ -52,7 +54,6 @@ import org.elasticsearch.xcontent.XContentBuilder;
 @XStreamAlias("elastic-simple-document-builder")
 @ComponentProfile(summary = "Build a document for elasticsearch using the raw payload and metadata", since = "3.9.1")
 @NoArgsConstructor
-@Slf4j
 public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
 
   @Override
@@ -66,8 +67,7 @@ public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
       builder.field("date", new Date());
       builder.endObject();
       result.add(new DocumentWrapper(msg.getUniqueId(), builder));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
     }
     return result;
@@ -78,4 +78,5 @@ public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
     map.entrySet().stream().filter(e -> !e.getKey().contains(".")).forEach(e -> result.put(e.getKey(), e.getValue()));
     return result;
   }
+
 }

@@ -1,9 +1,9 @@
 package com.adaptris.core.elastic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -16,7 +16,7 @@ import com.jayway.jsonpath.ReadContext;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import org.elasticsearch.common.Strings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SuperCsvGeopointBuilderTest extends CsvBuilderCase {
 

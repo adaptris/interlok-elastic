@@ -36,7 +36,7 @@ public class AdvancedElasticRestClientCreator extends ElasticRestClientCreator {
   @Getter
   @Setter
   @Deprecated(since = "4.5.0")
-  @ConfigDeprecated(removalVersion = "5.0.0", message = "Use 'async-http-client-config' instead", groups = Deprecated.class)
+  @ConfigDeprecated(removalVersion = "5.1.0", message = "Use 'async-http-client-config' instead", groups = Deprecated.class)
   private List<RequestInterceptorBuilder> requestInterceptors;
 
   /**

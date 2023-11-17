@@ -1,15 +1,17 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-  id 'nebula.optional-base' version '7.0.0'  apply false
-  id "io.freefair.lombok" version "6.5.1" apply false
-  id 'com.github.spotbugs' version '5.0.14' apply false
-  id 'org.owasp.dependencycheck' version '8.2.1' apply false
+  // Manage optional dependencies in maven pom.
+  id "nebula.optional-base" version "7.0.0"  apply false
+  id "com.github.spotbugs" version "5.2.1" apply false
+  id "org.sonarqube" version "4.4.1.3373"
+  id "org.owasp.dependencycheck" version "8.4.2" apply false
+  id "io.freefair.lombok" version "8.4" apply false
 }
 
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.8-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.8-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '5.0-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '5.0-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -23,20 +25,24 @@ ext {
   componentName='Interlok Elasticsearch'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.3'
-  log4jVersion = '2.19.0'
-  junitJupiterVersion = '5.9.1'
-  mockitoVersion = '4.9.0'
+  slf4jVersion = '2.0.9'
+  log4jVersion = '2.21.1'
+  junitJupiterVersion = '5.10.0'
+  mockitoVersion = '5.2.0'
 }
 
+// If graphviz is installed via scoop, plantuml doesn't find it because it's not
+// in its expected "location(s)" it searches for c:\*\graphviz**\dot.exe
+// so windows we'd expect to have the GRAPHVIZ_DOT env defined 
+// On Linux we should be able to find it via the path.
 ext.hasGraphViz = { ->
-//  def app = "dot"
-//  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//    app = app + ".exe"
-//  }
-//  return System.getenv("PATH").split(File.pathSeparator).any{
-//    java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
-//  }
+  def app = "dot"
+  if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    app = app + ".exe"
+  }
+  return System.getenv("GRAPHVIZ_DOT") !=null ||  System.getenv("PATH").split(File.pathSeparator).any{
+    java.nio.file.Paths.get("${it}").resolve(app).toFile().exists()
+  }
 }
 
 ext.gitBranchNameOrTimestamp = { branchName ->
@@ -58,16 +64,16 @@ ext.buildInfo = { ->
     }
 }
 
-if (JavaVersion.current().isJava8Compatible()) {
-  allprojects {
-    tasks.withType(Javadoc) {
-      options.addStringOption('Xdoclint:none', '-quiet')
-    }
-  }
-}
-
 task clean(type: Delete) {
   delete project.buildDir
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "adaptris_interlok-elastic"
+    property "sonar.organization", "adaptris-org"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
 
 allprojects {
@@ -85,16 +91,17 @@ allprojects {
 }
 
 subprojects {
-  apply plugin: 'java-library'
-  apply plugin: 'maven-publish'
-  apply plugin: 'jacoco'
+  apply plugin: "java-library"
+  apply plugin: "maven-publish"
+  apply plugin: "jacoco"
   apply plugin: "nebula.optional-base"
-  apply plugin: 'com.github.spotbugs'
-  apply plugin: 'org.owasp.dependencycheck'
+  apply plugin: "com.github.spotbugs"
+  apply plugin: "org.sonarqube"
+  apply plugin: "org.owasp.dependencycheck"
   apply plugin: "io.freefair.lombok"
 
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
@@ -142,26 +149,15 @@ subprojects {
 
     api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
     api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-    implementation ("org.yaml:snakeyaml:1.33")
+    implementation ("org.yaml:snakeyaml:2.2")
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
     implementation ("com.jayway.jsonpath:json-path:2.8.0")
     implementation ("commons-collections:commons-collections:3.2.2")
-    implementation ("joda-time:joda-time:2.12.0")
+    implementation ("joda-time:joda-time:2.12.5")
     implementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
     testAnnotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
 
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitJupiterVersion") {
-      because 'allows JUnit 3 and JUnit 4 tests to run'
-    }
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.1") {
-      because 'allows tests to run from IDEs that bundle older version of launcher'
-    }
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
-
-    testImplementation ('junit:junit:4.13.2')
+    testImplementation ("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
     testImplementation ("org.apache.logging.log4j:log4j-api:$log4jVersion")
     testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
@@ -181,8 +177,7 @@ subprojects {
       options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
       taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
       options.addStringOption "tagletpath", configurations.javadoc.asPath
-      options.addStringOption('Xdoclint:none', '-quiet')
-      options.addBooleanOption "-no-module-directories", true
+      options.addStringOption "Xdoclint:none", "-quiet"
     }
   }
 

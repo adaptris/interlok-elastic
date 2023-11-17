@@ -2,8 +2,8 @@ ext {
   componentName='Interlok Storage/Elastic: REST Client'
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  elasticVersion = '7.17.6'
-  jacksonVersion = '2.14.2'
+  elasticVersion = '7.17.13'
+  jacksonVersion = '2.15.3'
 }
 
 dependencies {
@@ -21,8 +21,8 @@ dependencies {
   }
   implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
   
-  implementation ("commons-codec:commons-codec:1.15")
-  implementation ("org.apache.httpcomponents:httpclient:4.5.13")
+  implementation ("commons-codec:commons-codec:1.16.0")
+  implementation ("org.apache.httpcomponents:httpclient:4.5.14")
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   implementation ("com.fasterxml.jackson.core:jackson-databind")

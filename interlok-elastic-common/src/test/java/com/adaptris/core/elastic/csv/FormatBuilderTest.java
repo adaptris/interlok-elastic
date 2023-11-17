@@ -1,24 +1,27 @@
 package com.adaptris.core.elastic.csv;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.apache.commons.csv.CSVFormat;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.adaptris.core.elastic.csv.BasicFormatBuilder.Style;
 
 @SuppressWarnings("deprecation")
 public class FormatBuilderTest {
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
 
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
 
   }
@@ -117,17 +120,20 @@ public class FormatBuilderTest {
     assertNotNull(builder.createFormat());
   }
 
-  @Test(expected=UnsupportedOperationException.class)
+  @Test
   public void testConfigureCSV() throws Exception {
     CSVFormat format = CSVFormat.newFormat(',');
     assertNotNull(CustomFormatBuilder.configureCSV(format, new String[]
     {
         "withCommentMarker", "withCommentStart"
     }, Character.class, "commentMarker", '#'));
-    CustomFormatBuilder.configureCSV(format, new String[] {
-        "hello",
-        "world"
-    }, Character.class, "dummyValue", '#');
+    
+    assertThrows(UnsupportedOperationException.class, () -> {
+      CustomFormatBuilder.configureCSV(format, new String[] {
+          "hello",
+          "world"
+      }, Character.class, "dummyValue", '#');
+    });
   }
 
   @Test
@@ -136,4 +142,5 @@ public class FormatBuilderTest {
       assertNotNull(new BasicFormatBuilder(s).createFormat());
     }
   }
+
 }
