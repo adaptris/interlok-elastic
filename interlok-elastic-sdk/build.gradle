@@ -11,9 +11,13 @@ dependencies {
   api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
   api ("com.adaptris:interlok-apache-http-async:$interlokCoreVersion") { changing= true}
   
-  implementation ("co.elastic.clients:elasticsearch-java:$elasticVersion")
+  implementation ("co.elastic.clients:elasticsearch-java:$elasticVersion") {
+    exclude group: "org.eclipse.parsson", module: "parsson"
+  }
   implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
   implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion")
+  
+  implementation ("org.eclipse.parsson:parsson:1.1.5")
   
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
