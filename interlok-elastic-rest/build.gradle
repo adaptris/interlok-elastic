@@ -21,7 +21,7 @@ dependencies {
   }
   implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
   
-  implementation ("commons-codec:commons-codec:1.16.0")
+  implementation ("commons-codec:commons-codec:1.16.1")
   implementation ("org.apache.httpcomponents:httpclient:4.5.14")
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
