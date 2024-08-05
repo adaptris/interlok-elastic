@@ -17,7 +17,7 @@ dependencies {
   implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
   implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion")
   
-  implementation ("org.eclipse.parsson:parsson:1.1.6")
+  implementation ("org.eclipse.parsson:parsson:1.1.7")
   
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
