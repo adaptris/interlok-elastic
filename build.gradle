@@ -3,10 +3,10 @@ import org.apache.tools.ant.taskdefs.condition.Os
 plugins {
   // Manage optional dependencies in maven pom.
   id "nebula.optional-base" version "7.0.0"  apply false
-  id "com.github.spotbugs" version "6.0.14" apply false
+  id "com.github.spotbugs" version "6.0.21" apply false
   id "org.sonarqube" version "4.4.1.3373"
-  id "org.owasp.dependencycheck" version "9.0.10" apply false
-  id "io.freefair.lombok" version "8.6" apply false
+  id "org.owasp.dependencycheck" version "10.0.3" apply false
+  id "io.freefair.lombok" version "8.10" apply false
 }
 
 ext {
@@ -25,9 +25,9 @@ ext {
   componentName='Interlok Elasticsearch'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.13'
+  slf4jVersion = '2.0.16'
   log4jVersion = '2.23.1'
-  junitJupiterVersion = '5.10.2'
+  junitJupiterVersion = '5.11.0'
   mockitoVersion = '5.2.0'
 }
 
@@ -149,7 +149,7 @@ subprojects {
 
     api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
     api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-    implementation ("org.yaml:snakeyaml:2.2")
+    implementation ("org.yaml:snakeyaml:2.3")
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
     implementation ("com.jayway.jsonpath:json-path:2.9.0")
     implementation ("commons-collections:commons-collections:3.2.2")
@@ -250,6 +250,11 @@ subprojects {
     formats = [ "HTML", "JUNIT" ]
     junitFailOnCVSS = 7.0
     failBuildOnCVSS = 7.0
+    nvd {
+      apiKey = System.getenv("NVD_API_KEY")
+      delay=project.findProperty("dependencyCheckNvdDelay")
+      datafeedUrl=project.findProperty("dependencyCheckNvdDatafeedUrl")
+    }
     analyzers {
       assemblyEnabled=false
       knownExploitedURL=project.findProperty('dependencyCheckKnownExploitedURL')
