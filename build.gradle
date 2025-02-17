@@ -149,7 +149,7 @@ subprojects {
 
     api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
     api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-    implementation ("org.yaml:snakeyaml:2.3")
+    implementation ("org.yaml:snakeyaml:2.4")
     implementation ("org.slf4j:slf4j-api:$slf4jVersion")
     implementation ("com.jayway.jsonpath:json-path:2.9.0")
     implementation ("commons-collections:commons-collections:3.2.2")
