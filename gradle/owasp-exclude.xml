@@ -16,5 +16,26 @@
     <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
     <cve>CVE-2022-1471</cve>
     <cve>CVE-2022-3064</cve>
-  </suppress>  	
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+      To remediate these issues, we need a major upgrade to version 8.x.x
+      ]]>
+    </notes>
+    <cve>CVE-2024-52980</cve>
+    <cve>CVE-2025-68384</cve>
+    <cve>CVE-2025-37727</cve>
+    <cve>CVE-2025-68390</cve>
+    <cve>CVE-2025-37731</cve>
+  </suppress>
+  <suppress>
+    <notes>
+      <![CDATA[
+      This vulnerability is with commons-lang version 2.0-2.5 which is only imported via other interlok components.
+      This vulnerability will be remediated in the dependent components when the next release is built.
+      ]]>
+    </notes>
+    <cve>CVE-2025-48924</cve>
+  </suppress>
 </suppressions>
