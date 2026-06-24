@@ -2,7 +2,7 @@ package com.adaptris.core.elastic.rest;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
