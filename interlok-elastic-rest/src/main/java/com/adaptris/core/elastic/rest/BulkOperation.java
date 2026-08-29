@@ -16,7 +16,7 @@
 
 package com.adaptris.core.elastic.rest;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
