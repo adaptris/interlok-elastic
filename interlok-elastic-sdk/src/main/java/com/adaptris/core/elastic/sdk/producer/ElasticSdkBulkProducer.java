@@ -1,6 +1,6 @@
 package com.adaptris.core.elastic.sdk.producer;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;

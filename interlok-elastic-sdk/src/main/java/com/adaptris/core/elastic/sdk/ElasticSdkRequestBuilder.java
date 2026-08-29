@@ -3,6 +3,7 @@ package com.adaptris.core.elastic.sdk;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.elasticsearch.common.Strings;
 import org.slf4j.Logger;
@@ -41,7 +42,9 @@ public class ElasticSdkRequestBuilder {
     return UpdateRequest.of(eIndex -> {
       return eIndex
           .index(index)
-          .doc(Strings.toString(doc.content()).getBytes(Charset.forName(charEnc)))
+          .doc(readJson(
+                  new ByteArrayInputStream(
+                          Strings.toString(doc.content()).getBytes(Charset.forName(charEnc))), client))
           .routing(doc.routing())
           .id(doc.uniqueId())
           .docAsUpsert(upsert)

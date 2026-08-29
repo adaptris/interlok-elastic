@@ -9,6 +9,7 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.RestHighLevelClientBuilder;
 import org.elasticsearch.client.sniff.Sniffer;
 
 /** Default elastic client behaviour.
@@ -23,7 +24,9 @@ public class ElasticRestClientCreator implements ElasticClientCreator {
     List<HttpHost> hosts = new ArrayList<>();
     transportUrls.forEach((url) -> hosts.add(HttpHost.create(url)));
     RestClientBuilder restClientBuilder = configure(RestClient.builder(hosts.toArray(new HttpHost[0])));
-    RestHighLevelClient client = new RestHighLevelClient(restClientBuilder);
+    RestHighLevelClient client = new RestHighLevelClientBuilder(restClientBuilder.build())
+            .setApiCompatibilityMode(true)
+            .build();
     Sniffer sniffer = Sniffer.builder(client.getLowLevelClient()).build();
     return new TransportClient(client, sniffer);
   }
