@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.csv.CSVFormat;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Implementation of {@link FormatBuilder} that maps the standard commons-csv formats.
