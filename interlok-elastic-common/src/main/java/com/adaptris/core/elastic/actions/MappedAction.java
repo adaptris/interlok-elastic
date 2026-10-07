@@ -7,7 +7,7 @@ import com.adaptris.core.ServiceException;
 import com.adaptris.core.elastic.DocumentWrapper;
 import com.adaptris.util.KeyValuePairList;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
