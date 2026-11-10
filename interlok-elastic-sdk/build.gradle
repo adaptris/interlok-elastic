@@ -2,25 +2,21 @@ ext {
   componentName='Interlok Storage/Elastic: SDK Client'
   componentDesc="Producing to Elasticsearch using their SDK"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  elasticVersion = '7.17.29'
-  jacksonVersion = '2.22.4'
 }
 
 dependencies {
   api project(':interlok-elastic-common')
-  api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
-  api ("com.adaptris:interlok-apache-http-async:$interlokCoreVersion") { changing= true}
+  api ("com.adaptris:interlok-apache-http") { changing= true}
+  api ("com.adaptris:interlok-apache-http-async") { changing= true}
   
-  implementation ("co.elastic.clients:elasticsearch-java:$elasticVersion") {
+  implementation ("co.elastic.clients:elasticsearch-java") {
     exclude group: "org.eclipse.parsson", module: "parsson"
   }
-  implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
-  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion")
+  implementation ("org.elasticsearch:elasticsearch-x-content")
+  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client")
   
-  implementation ("org.eclipse.parsson:parsson:1.1.7")
+  implementation ("org.eclipse.parsson:parsson")
   
-  // Dependency to platform/BOM
-  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   implementation ("com.fasterxml.jackson.core:jackson-databind")
   implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-smile")
   implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")

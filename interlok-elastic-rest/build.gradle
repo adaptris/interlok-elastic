@@ -2,29 +2,25 @@ ext {
   componentName='Interlok Storage/Elastic: REST Client'
   componentDesc="Producing to Elasticsearch using their REST api"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  elasticVersion = '7.17.29'
-  jacksonVersion = '2.22.4'
 }
 
 dependencies {
   api project(':interlok-elastic-common')
-  api ("com.adaptris:interlok-apache-http:$interlokCoreVersion") { changing= true}
-  api ("com.adaptris:interlok-apache-http-async:$interlokCoreVersion") { changing= true}
-  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client:$elasticVersion") {
+  api ("com.adaptris:interlok-apache-http") { changing= true}
+  api ("com.adaptris:interlok-apache-http-async") { changing= true}
+  implementation ("org.elasticsearch.client:elasticsearch-rest-high-level-client") {
     exclude group: "org.yaml", module: "snakeyaml"
     exclude group: "org.apache.logging.log4j", module:"log4j-api"
   }
-  implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer:$elasticVersion") {
+  implementation ("org.elasticsearch.client:elasticsearch-rest-client-sniffer") {
     exclude group: "commons-codec", module: "commons-codec"
     exclude group: "org.apache.httpcomponents", module: "httpclient"
     exclude group: "org.apache.logging.log4j", module:"log4j-api"
   }
-  implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
+  implementation ("org.elasticsearch:elasticsearch-x-content")
   
-  implementation ("commons-codec:commons-codec:1.23.0")
-  implementation ("org.apache.httpcomponents:httpclient:4.5.14")
-  // Dependency to platform/BOM
-  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  implementation ("commons-codec:commons-codec")
+  implementation ("org.apache.httpcomponents:httpclient")
   implementation ("com.fasterxml.jackson.core:jackson-databind")
   implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-smile")
   implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")

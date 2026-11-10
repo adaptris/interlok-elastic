@@ -2,26 +2,22 @@ ext {
   componentName='Interlok Storage/Elastic: Common'
   componentDesc="Elasticsearch components that are not transport specific"
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
-  elasticVersion = '7.17.29'
-  jacksonVersion = '2.22.4'
 }
 
 dependencies {
-  api ("com.adaptris:interlok-json:$interlokCoreVersion") { changing=true}
-  api ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
+  api ("com.adaptris:interlok-json") { changing=true}
+  api ("com.adaptris:interlok-csv") { changing=true}
   // INTERLOK-3559 since we removed apache-csv out of interlok-csv it's
   // a bigger deal to remove it out of elastic
-  api("org.apache.commons:commons-csv:1.14.0")
-  api("net.sf.supercsv:super-csv:2.4.0")
+  api("org.apache.commons:commons-csv")
+  api("net.sf.supercsv:super-csv")
 
-  implementation ("org.elasticsearch:elasticsearch:$elasticVersion") {
+  implementation ("org.elasticsearch:elasticsearch") {
     exclude group: "org.yaml", module: "snakeyaml"
     exclude group: "org.apache.logging.log4j", module:"log4j-api"
   }
-  implementation ("org.apache.lucene:lucene-core:9.11.1")
-  implementation ("org.elasticsearch:elasticsearch-x-content:$elasticVersion")
-  // Dependency to platform/BOM
-  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  implementation ("org.apache.lucene:lucene-core")
+  implementation ("org.elasticsearch:elasticsearch-x-content")
   implementation ("com.fasterxml.jackson.core:jackson-databind")
   implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-smile")
   implementation ("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
