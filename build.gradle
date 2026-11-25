@@ -1,8 +1,6 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-  // Manage optional dependencies in maven pom.
-  id "nebula.optional-base" version "7.0.0"  apply false
   id "com.github.spotbugs" version "6.5.13" apply false
   id "org.sonarqube" version "6.3.1.5724"
   id "org.owasp.dependencycheck" version "12.2.2" apply false
@@ -92,14 +90,13 @@ subprojects {
   apply plugin: "java-library"
   apply plugin: "maven-publish"
   apply plugin: "jacoco"
-  apply plugin: "nebula.optional-base"
   apply plugin: "com.github.spotbugs"
   apply plugin: "org.sonarqube"
   apply plugin: "org.owasp.dependencycheck"
   apply plugin: "io.freefair.lombok"
 
-  sourceCompatibility = JavaVersion.VERSION_17
-  targetCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_21
   group   = 'com.adaptris'
   version = releaseVersion
   def versionDir = "$buildDir/version"
